@@ -8,6 +8,17 @@
     <artifactId>MN2Database</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
+    <distributionManagement>
+        <repository>
+            <id>internal</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <build>
         <finalName>${project.artifactId}-${project.version}</finalName>
         <plugins>
