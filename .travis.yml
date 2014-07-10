@@ -2,8 +2,8 @@ language: java
 jdk:
   - oraclejdk8
 
-before_install: "git clone -b travis `git config --get https://github.com/MultiNodeMinecraftNetwork/MN2-Database.git` target/travis"
-script: "[ ${TRAVIS_PULL_REQUEST} = 'false' ] && mvn clean deploy --settings target/travis/settings.xml || mvn clean verify --settings target/travis/settings.xml"
+before_install: "git clone -b travis `git config --get https://github.com/MultiNodeMinecraftNetwork/MN2-Database.git` MN2-Database/travis"
+script: "[ ${TRAVIS_PULL_REQUEST} = 'false' ] && mvn clean deploy --settings target/travis/settings.xml || mvn clean verify --settings MN2-Database/travis/settings.xml"
 
 branches:
   except:
