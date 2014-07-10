@@ -1,3 +1,15 @@
 language: java
 jdk:
   - oraclejdk8
+
+before_install: "git clone -b travis `git config --get https://github.com/MultiNodeMinecraftNetwork/MN2-Database.git` target/travis"
+script: "[ ${TRAVIS_PULL_REQUEST} = 'false' ] && mvn clean deploy --settings target/travis/settings.xml || mvn clean verify --settings target/travis/settings.xml"
+
+branches:
+  except:
+    - travis
+
+env:
+  global:
+    - secure: "W2Z8Tx1ZnY8g725+cXjIdVKzx6YdBVUTGyfFASltq9ZdJMmyHWA0oLBJUm6iI+aH2e3DvYYf6Vm+pHkX/YA6cLaOqK886X7fpxPGDBB3h8zwtvROw7SP9NT9ZEP2j/jehVcJE8K794r0jcdxkgndxSeRGb/JwrHkzjwCbt14a4A="
+    - secure: "TG+QFAJWiNQaOGU0sSVkBdhrOO42k1vrlp0ZYFyPUnWaW0LEPniPUd7nAa+dX6zPHND038jWN55DpRbcRTjuOv+LswOaY4DARKzWOxNc7HZe/CX3fIDr630tqPJ1E2sw3QO0R/q8ngcG/WtF2YWp34eeEkRK0m11Gv7KrCMhddY="
