@@ -12,7 +12,7 @@ public class MongoDatabase {
 
     private DB db;
 
-    public MongoDatabase(List<ServerAddress> addressList, String database) {
+    public MongoDatabase(List<ServerAddress> addressList, String database) throws MongoException {
         MongoClient mongoClient = new MongoClient(addressList);
         mongoClient.setWriteConcern(WriteConcern.REPLICA_ACKNOWLEDGED);
         mongoClient.setReadPreference(ReadPreference.primaryPreferred());
