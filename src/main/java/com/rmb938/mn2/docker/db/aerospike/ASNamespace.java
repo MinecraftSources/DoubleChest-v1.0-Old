@@ -14,8 +14,9 @@ public class ASNamespace {
         this.db = db;
     }
 
-    public void registerSet(ASSet asSet) {
+    public ASSet registerSet(ASSet asSet) {
         sets.put(asSet.getName(), asSet);
+        return asSet;
     }
 
     public ASSet getASSet(String setName) {

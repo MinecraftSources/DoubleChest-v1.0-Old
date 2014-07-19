@@ -15,12 +15,13 @@ public class AerospikeDatabase {
 
     private HashMap<String, ASNamespace> namespaces = new HashMap<>();
 
-    public AerospikeDatabase(Host[] hosts) throws AerospikeException {
+    public AerospikeDatabase(Host[] hosts) {
         this.hosts = hosts;
     }
 
-    public void registerNamespace(ASNamespace namespace) {
+    public ASNamespace registerNamespace(ASNamespace namespace) {
         namespaces.put(namespace.getName(), namespace);
+        return namespace;
     }
 
     public ASNamespace getASNamespace(String namespace) {

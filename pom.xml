@@ -58,6 +58,7 @@
                                     <include>org.mongodb:mongo-java-driver:*</include>
                                     <include>redis.clients:jedis:*</include>
                                     <include>org.apache.logging.log4j:log4j-core:*</include>
+                                    <include>com.aerospike:aerospike-client:*</include>
                                 </includes>
                             </artifactSet>
                         </configuration>
