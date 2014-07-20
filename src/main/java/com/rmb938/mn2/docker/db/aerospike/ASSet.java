@@ -1,6 +1,8 @@
 package com.rmb938.mn2.docker.db.aerospike;
 
 import com.aerospike.client.*;
+import com.aerospike.client.large.LargeList;
+import com.aerospike.client.large.LargeMap;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.client.query.Filter;
 import com.aerospike.client.query.RecordSet;
@@ -36,17 +38,32 @@ public class ASSet {
         return exists;
     }
 
+    public LargeMap getLargeMap(Key key, String bin) throws AerospikeException {
+        AerospikeClient client = asNamespace.getDb().getClient();
+        LargeMap map = client.getLargeMap(null, key, bin, null);
+        client.close();
+        return map;
+    }
+
+    public LargeList getLargeList(Key key, String bin) throws AerospikeException {
+        AerospikeClient client = asNamespace.getDb().getClient();
+        LargeList list = client.getLargeList(null, key, bin, null);
+        client.close();
+        return list;
+    }
+
     public void putRecord(WritePolicy policy, Key key, Bin... bins) throws AerospikeException {
         AerospikeClient client = asNamespace.getDb().getClient();
         client.put(policy, key, bins);
         client.close();
     }
 
-    public Record getRecord(String key) throws AerospikeException {
+    public Map.Entry<Key, Record> getRecord(String key) throws AerospikeException {
         AerospikeClient client = asNamespace.getDb().getClient();
-        Record record = client.get(null, new Key(asNamespace.getName(), name, key));
+        Key key1 = new Key(asNamespace.getName(), name, key);
+        Record record = client.get(null, key1);
         client.close();
-        return record;
+        return new AbstractMap.SimpleEntry<>(key1, record);
     }
 
     public Map.Entry<Key, Record> getRecord(Filter... filters) throws AerospikeException {
@@ -57,7 +74,9 @@ public class ASSet {
         Statement stmt = new Statement();
         stmt.setNamespace(asNamespace.getName());
         stmt.setSetName(name);
-        stmt.setFilters(filters);
+        if (filters != null) {
+            stmt.setFilters(filters);
+        }
 
         RecordSet rs = client.query(null, stmt);
         if (rs.next()) {
