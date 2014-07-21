@@ -62,6 +62,11 @@ public class MongoDatabase {
         return dbCollection.find();
     }
 
+    public DBCursor findMany(String collection, DBObject query) {
+        DBCollection dbCollection = getCollection(collection);
+        return dbCollection.find(query);
+    }
+
     public void insert(String collection, DBObject object) {
         DBCollection dbCollection = getCollection(collection);
         dbCollection.insert(object);
