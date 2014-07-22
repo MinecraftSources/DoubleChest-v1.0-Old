@@ -57,6 +57,16 @@ public class MongoDatabase {
         dbCollection.remove(query);
     }
 
+    public long count(String collection) {
+        DBCollection dbCollection = getCollection(collection);
+        return dbCollection.count();
+    }
+
+    public long count(String collection, DBObject query) {
+        DBCollection dbCollection = getCollection(collection);
+        return dbCollection.count(query);
+    }
+
     public DBCursor findMany(String collection) {
         DBCollection dbCollection = getCollection(collection);
         return dbCollection.find();
