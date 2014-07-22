@@ -14,8 +14,10 @@ public class MongoDatabase {
 
     public MongoDatabase(List<ServerAddress> addressList, String database) throws MongoException {
         MongoClient mongoClient = new MongoClient(addressList);
-        mongoClient.setWriteConcern(WriteConcern.REPLICA_ACKNOWLEDGED);
-        mongoClient.setReadPreference(ReadPreference.primaryPreferred());
+        if (addressList.size() > 1) {
+            mongoClient.setWriteConcern(WriteConcern.REPLICA_ACKNOWLEDGED);
+            mongoClient.setReadPreference(ReadPreference.primaryPreferred());
+        }
         db = mongoClient.getDB(database);
     }
 
