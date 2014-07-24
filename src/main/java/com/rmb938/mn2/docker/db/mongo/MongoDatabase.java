@@ -13,7 +13,12 @@ public class MongoDatabase {
     private DB db;
 
     public MongoDatabase(List<ServerAddress> addressList, String database) throws MongoException {
-        MongoClientOptions clientOptions = MongoClientOptions.builder().connectTimeout(30).build();
+        MongoClientOptions clientOptions = MongoClientOptions.builder().connectTimeout(30000)
+                .heartbeatConnectRetryFrequency(15)
+                .heartbeatConnectTimeout(15)
+                .heartbeatFrequency(15)
+                .heartbeatThreadCount(1)
+                .build();
         MongoClient mongoClient = new MongoClient(addressList, clientOptions);
         if (addressList.size() > 1) {
             mongoClient.setWriteConcern(WriteConcern.REPLICA_ACKNOWLEDGED);
