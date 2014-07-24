@@ -1,13 +1,12 @@
 package com.rmb938.mn2.docker.db.rabbitmq;
 
-import com.rabbitmq.client.Address;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.*;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.util.List;
 
+@Log4j2
 public class RabbitMQ {
 
     private Connection connection;
@@ -21,6 +20,17 @@ public class RabbitMQ {
         factory.setAutomaticRecoveryEnabled(true);
         factory.setTopologyRecoveryEnabled(true);
         connection = factory.newConnection(addressList.toArray(new Address[addressList.size()]));
+        connection.addBlockedListener(new BlockedListener() {
+            @Override
+            public void handleBlocked(String s) throws IOException {
+                log.info("Blocked Connection "+s);
+            }
+
+            @Override
+            public void handleUnblocked() throws IOException {
+
+            }
+        });
     }
 
     public Channel getChannel() throws IOException {

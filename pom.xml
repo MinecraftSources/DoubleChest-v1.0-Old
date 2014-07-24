@@ -55,6 +55,7 @@
                                     <include>org.mongodb:mongo-java-driver:*</include>
                                     <include>org.apache.logging.log4j:log4j-api:*</include>
                                     <include>org.apache.logging.log4j:log4j-core:*</include>
+                                    <include>org.projectlombok:lombok:*</include>
                                 </includes>
                             </artifactSet>
                         </configuration>
@@ -79,6 +80,11 @@
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
             <version>3.3.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.14.4</version>
         </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>
