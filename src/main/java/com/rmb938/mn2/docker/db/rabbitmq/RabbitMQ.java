@@ -9,32 +9,22 @@ import java.util.List;
 @Log4j2
 public class RabbitMQ {
 
-    private Connection connection;
+    private final ConnectionFactory factory;
+    private final Address[] addresses;
 
     public RabbitMQ(List<Address> addressList, String username, String password) throws IOException {
-        ConnectionFactory factory = new ConnectionFactory();
+        factory = new ConnectionFactory();
         factory.setUsername(username);
         factory.setPassword(password);
         factory.setRequestedHeartbeat(1);
         factory.setConnectionTimeout(5000);
         factory.setAutomaticRecoveryEnabled(true);
         factory.setTopologyRecoveryEnabled(true);
-        connection = factory.newConnection(addressList.toArray(new Address[addressList.size()]));
-        connection.addBlockedListener(new BlockedListener() {
-            @Override
-            public void handleBlocked(String s) throws IOException {
-                log.info("Blocked Connection "+s);
-            }
-
-            @Override
-            public void handleUnblocked() throws IOException {
-
-            }
-        });
+        addresses = addressList.toArray(new Address[addressList.size()]);
     }
 
-    public Channel getChannel() throws IOException {
-        return connection.createChannel();
+    public Connection getConnection() throws IOException {
+        return factory.newConnection(addresses);
     }
 
 }
