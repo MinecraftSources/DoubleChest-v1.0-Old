@@ -18,6 +18,7 @@ public class RabbitMQ {
         factory.setPassword(password);
         factory.setRequestedHeartbeat(1);
         factory.setConnectionTimeout(5000);
+        factory.setNetworkRecoveryInterval(0);
         factory.setAutomaticRecoveryEnabled(true);
         factory.setTopologyRecoveryEnabled(true);
         addresses = addressList.toArray(new Address[addressList.size()]);
