@@ -124,6 +124,7 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         dbObject.append("_node", server.getNode().get_id());
         dbObject.append("lastUpdate", 0L);
         dbObject.append("containerId", "NULL");
+        dbObject.append("number", getNextNumber(server.getServerType()));
         getDb().insert(getCollection(), dbObject);
         return (ObjectId) dbObject.get("_id");
     }
