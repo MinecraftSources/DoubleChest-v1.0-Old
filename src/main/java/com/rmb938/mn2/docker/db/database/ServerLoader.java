@@ -2,11 +2,16 @@ package com.rmb938.mn2.docker.db.database;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.rmb938.mn2.docker.db.entity.Node;
 import com.rmb938.mn2.docker.db.entity.Server;
+import com.rmb938.mn2.docker.db.entity.ServerType;
 import com.rmb938.mn2.docker.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
+
+import java.util.ArrayList;
 
 @Log4j2
 public class ServerLoader extends EntityLoader<Server> {
@@ -18,6 +23,31 @@ public class ServerLoader extends EntityLoader<Server> {
         super(db, "servers");
         this.nodeLoader = nodeLoader;
         this.serverTypeLoader = serverTypeLoader;
+    }
+
+    public Long getCount(ServerType serverType) {
+        BasicDBList and = new BasicDBList();
+        and.add(new BasicDBObject("_servertype", serverType.get_id()));
+        and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis()-60000)));
+        return getDb().count(getCollection(), new BasicDBObject("$and", and));
+    }
+
+    public ArrayList<Server> nodeServers(Node node) {
+        ArrayList<Server> servers = new ArrayList<>();
+
+        BasicDBList and = new BasicDBList();
+        and.add(new BasicDBObject("_node", node.get_id()));
+        and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis()-60000)));
+        DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("$and",and));
+        while (dbCursor.hasNext()) {
+            DBObject dbObject = dbCursor.next();
+            Server server = loadEntity((ObjectId)dbObject.get("_id"));
+            if (server != null) {
+                servers.add(server);
+            }
+        }
+
+        return servers;
     }
 
     @Override
