@@ -59,4 +59,9 @@ public class PluginLoader extends EntityLoader<MN2Plugin> {
     public ObjectId insertEntity(MN2Plugin plugin) {
         return null;
     }
+
+    @Override
+    public void removeEntity(MN2Plugin entity) {
+
+    }
 }

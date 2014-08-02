@@ -4,7 +4,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.rmb938.mn2.docker.db.entity.MN2Node;
-import com.rmb938.mn2.docker.db.entity.MN2Node;
 import com.rmb938.mn2.docker.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
@@ -60,5 +59,10 @@ public class NodeLoader extends EntityLoader<MN2Node> {
     @Override
     public ObjectId insertEntity(MN2Node node) {
         return null;
+    }
+
+    @Override
+    public void removeEntity(MN2Node entity) {
+
     }
 }

@@ -25,4 +25,6 @@ public abstract class EntityLoader<T extends MN2Entity> {
 
     public abstract ObjectId insertEntity(T entity);
 
+    public abstract void removeEntity(T entity);
+
 }

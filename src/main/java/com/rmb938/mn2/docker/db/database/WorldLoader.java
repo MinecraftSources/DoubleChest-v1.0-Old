@@ -3,7 +3,6 @@ package com.rmb938.mn2.docker.db.database;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.rmb938.mn2.docker.db.entity.MN2World;
-import com.rmb938.mn2.docker.db.entity.MN2World;
 import com.rmb938.mn2.docker.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
@@ -50,5 +49,10 @@ public class WorldLoader extends EntityLoader<MN2World> {
     @Override
     public ObjectId insertEntity(MN2World world) {
         return null;
+    }
+
+    @Override
+    public void removeEntity(MN2World entity) {
+
     }
 }

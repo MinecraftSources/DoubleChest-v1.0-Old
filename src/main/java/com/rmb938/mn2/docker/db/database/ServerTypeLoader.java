@@ -121,4 +121,9 @@ public class ServerTypeLoader extends EntityLoader<MN2ServerType> {
     public ObjectId insertEntity(MN2ServerType serverType) {
         return null;
     }
+
+    @Override
+    public void removeEntity(MN2ServerType entity) {
+
+    }
 }

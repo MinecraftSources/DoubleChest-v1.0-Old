@@ -6,8 +6,6 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.rmb938.mn2.docker.db.entity.MN2Node;
 import com.rmb938.mn2.docker.db.entity.MN2Server;
-import com.rmb938.mn2.docker.db.entity.MN2Server;
-import com.rmb938.mn2.docker.db.entity.MN2ServerType;
 import com.rmb938.mn2.docker.db.entity.MN2ServerType;
 import com.rmb938.mn2.docker.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
@@ -90,5 +88,10 @@ public class ServerLoader extends EntityLoader<MN2Server> {
     @Override
     public ObjectId insertEntity(MN2Server server) {
         return null;
+    }
+
+    @Override
+    public void removeEntity(MN2Server entity) {
+        getDb().delete(getCollection(), new BasicDBObject("_id", entity.get_id()));
     }
 }
