@@ -28,14 +28,14 @@ public class ServerLoader extends EntityLoader<MN2Server> {
     public Long getCount(MN2ServerType serverType) {
         BasicDBList and = new BasicDBList();
         and.add(new BasicDBObject("_servertype", serverType.get_id()));
-        and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis()-60000)));
+        and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis() - 60000)));
         return getDb().count(getCollection(), new BasicDBObject("$and", and));
     }
 
     public int getNextNumber(MN2ServerType serverType) {
         BasicDBList and = new BasicDBList();
         and.add(new BasicDBObject("_servertype", serverType.get_id()));
-        and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$lt", System.currentTimeMillis()-60000)));
+        and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$lt", System.currentTimeMillis() - 60000)));
         DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("$and", and));
         dbCursor.sort(new BasicDBObject("number", 1));
         int number = 1;
@@ -45,7 +45,7 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         } else {
             and = new BasicDBList();
             and.add(new BasicDBObject("_servertype", serverType.get_id()));
-            and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis()-60000)));
+            and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis() - 60000)));
             dbCursor = getDb().findMany(getCollection(), new BasicDBObject("$and", and));
             dbCursor.sort(new BasicDBObject("number", -1));
             if (dbCursor.size() > 0) {
@@ -63,11 +63,11 @@ public class ServerLoader extends EntityLoader<MN2Server> {
 
         BasicDBList and = new BasicDBList();
         and.add(new BasicDBObject("_node", node.get_id()));
-        and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis()-60000)));
-        DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("$and",and));
+        and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis() - 60000)));
+        DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("$and", and));
         while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
-            MN2Server server = loadEntity((ObjectId)dbObject.get("_id"));
+            MN2Server server = loadEntity((ObjectId) dbObject.get("_id"));
             if (server != null) {
                 servers.add(server);
             }
@@ -108,12 +108,24 @@ public class ServerLoader extends EntityLoader<MN2Server> {
 
     @Override
     public void saveEntity(MN2Server server) {
+        BasicDBObject values = new BasicDBObject();
+        values.put("lastUpdate", server.getLastUpdate());
+        values.put("containerId", server.getContainerId());
 
+        BasicDBObject set = new BasicDBObject("$set", values);
+        getDb().updateDocument(getCollection(), new BasicDBObject("_id", server.get_id()), set);
+        log.info("Saving Server " + server.get_id());
     }
 
     @Override
     public ObjectId insertEntity(MN2Server server) {
-        return null;
+        BasicDBObject dbObject = new BasicDBObject("_id", new ObjectId());
+        dbObject.append("_servertype", server.getServerType().get_id());
+        dbObject.append("_node", server.getNode().get_id());
+        dbObject.append("lastUpdate", 0L);
+        dbObject.append("containerId", "NULL");
+        getDb().insert(getCollection(), dbObject);
+        return (ObjectId) dbObject.get("_id");
     }
 
     @Override
