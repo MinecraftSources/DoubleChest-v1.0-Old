@@ -4,9 +4,11 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.rmb938.mn2.docker.db.entity.Node;
-import com.rmb938.mn2.docker.db.entity.Server;
-import com.rmb938.mn2.docker.db.entity.ServerType;
+import com.rmb938.mn2.docker.db.entity.MN2Node;
+import com.rmb938.mn2.docker.db.entity.MN2Server;
+import com.rmb938.mn2.docker.db.entity.MN2Server;
+import com.rmb938.mn2.docker.db.entity.MN2ServerType;
+import com.rmb938.mn2.docker.db.entity.MN2ServerType;
 import com.rmb938.mn2.docker.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
@@ -14,7 +16,7 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 
 @Log4j2
-public class ServerLoader extends EntityLoader<Server> {
+public class ServerLoader extends EntityLoader<MN2Server> {
 
     private final NodeLoader nodeLoader;
     private final ServerTypeLoader serverTypeLoader;
@@ -25,15 +27,15 @@ public class ServerLoader extends EntityLoader<Server> {
         this.serverTypeLoader = serverTypeLoader;
     }
 
-    public Long getCount(ServerType serverType) {
+    public Long getCount(MN2ServerType serverType) {
         BasicDBList and = new BasicDBList();
         and.add(new BasicDBObject("_servertype", serverType.get_id()));
         and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis()-60000)));
         return getDb().count(getCollection(), new BasicDBObject("$and", and));
     }
 
-    public ArrayList<Server> nodeServers(Node node) {
-        ArrayList<Server> servers = new ArrayList<>();
+    public ArrayList<MN2Server> nodeServers(MN2Node node) {
+        ArrayList<MN2Server> servers = new ArrayList<>();
 
         BasicDBList and = new BasicDBList();
         and.add(new BasicDBObject("_node", node.get_id()));
@@ -41,7 +43,7 @@ public class ServerLoader extends EntityLoader<Server> {
         DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("$and",and));
         while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
-            Server server = loadEntity((ObjectId)dbObject.get("_id"));
+            MN2Server server = loadEntity((ObjectId)dbObject.get("_id"));
             if (server != null) {
                 servers.add(server);
             }
@@ -51,14 +53,14 @@ public class ServerLoader extends EntityLoader<Server> {
     }
 
     @Override
-    public Server loadEntity(ObjectId _id) {
+    public MN2Server loadEntity(ObjectId _id) {
         if (_id == null) {
             log.error("Error loading world. _id null");
             return null;
         }
         DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("_id", _id));
         if (dbObject != null) {
-            Server server = new Server();
+            MN2Server server = new MN2Server();
             server.set_id((ObjectId) dbObject.get("_id"));
             server.setServerType(serverTypeLoader.loadEntity((ObjectId) dbObject.get("_servertype")));
             server.setNode(nodeLoader.loadEntity((ObjectId) dbObject.get("_node")));
@@ -81,12 +83,12 @@ public class ServerLoader extends EntityLoader<Server> {
     }
 
     @Override
-    public void saveEntity(Server server) {
+    public void saveEntity(MN2Server server) {
 
     }
 
     @Override
-    public ObjectId insertEntity(Server server) {
+    public ObjectId insertEntity(MN2Server server) {
         return null;
     }
 }

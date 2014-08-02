@@ -1,11 +1,11 @@
 package com.rmb938.mn2.docker.db.database;
 
+import com.rmb938.mn2.docker.db.entity.MN2Entity;
 import com.rmb938.mn2.docker.db.mongo.MongoDatabase;
-import com.rmb938.mn2.docker.db.entity.Entity;
 import lombok.Getter;
 import org.bson.types.ObjectId;
 
-public abstract class EntityLoader<T extends Entity> {
+public abstract class EntityLoader<T extends MN2Entity> {
 
     @Getter
     private final MongoDatabase db;

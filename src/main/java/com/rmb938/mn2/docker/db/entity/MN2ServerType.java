@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 @Log4j2
-public class ServerType extends Entity {
+public class MN2ServerType extends MN2Entity {
 
     @Getter
     @Setter
@@ -28,17 +28,17 @@ public class ServerType extends Entity {
 
     @Getter
     @Setter
-    private World defaultWorld;
+    private MN2World defaultWorld;
 
     @Getter
-    private ArrayList<Map.Entry<Plugin, PluginConfig>> plugins = new ArrayList<>();
+    private ArrayList<Map.Entry<MN2Plugin, MN2Plugin.PluginConfig>> plugins = new ArrayList<>();
 
     @Getter
-    private ArrayList<World> worlds = new ArrayList<>();
+    private ArrayList<MN2World> worlds = new ArrayList<>();
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof ServerType && get_id().equals(((ServerType) obj).get_id());
+        return obj instanceof MN2ServerType && get_id().equals(((MN2ServerType) obj).get_id());
     }
 
     @Override

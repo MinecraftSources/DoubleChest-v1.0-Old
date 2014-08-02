@@ -2,32 +2,33 @@ package com.rmb938.mn2.docker.db.database;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import com.rmb938.mn2.docker.db.entity.World;
+import com.rmb938.mn2.docker.db.entity.MN2World;
+import com.rmb938.mn2.docker.db.entity.MN2World;
 import com.rmb938.mn2.docker.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
 
 @Log4j2
-public class WorldLoader extends EntityLoader<World> {
+public class WorldLoader extends EntityLoader<MN2World> {
 
     public WorldLoader(MongoDatabase db) {
         super(db, "worlds");
     }
 
     @Override
-    public World loadEntity(ObjectId _id) {
+    public MN2World loadEntity(ObjectId _id) {
         if (_id == null) {
             log.error("Error loading world. _id null");
             return null;
         }
         DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("_id", _id));
         if (dbObject != null) {
-            World world = new World();
+            MN2World world = new MN2World();
             world.set_id(_id);
             world.setName((String) dbObject.get("name"));
             world.setFolder((String) dbObject.get("folder"));
             try {
-                world.setEnvironment(World.Environment.valueOf((String) dbObject.get("environment")));
+                world.setEnvironment(MN2World.Environment.valueOf((String) dbObject.get("environment")));
             } catch (Exception ex) {
                 log.error("Invalid environment for world "+world.getName());
                 return null;
@@ -42,12 +43,12 @@ public class WorldLoader extends EntityLoader<World> {
     }
 
     @Override
-    public void saveEntity(World world) {
+    public void saveEntity(MN2World world) {
 
     }
 
     @Override
-    public ObjectId insertEntity(World world) {
+    public ObjectId insertEntity(MN2World world) {
         return null;
     }
 }

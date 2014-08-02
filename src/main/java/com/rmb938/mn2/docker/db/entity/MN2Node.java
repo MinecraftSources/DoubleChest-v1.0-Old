@@ -3,7 +3,7 @@ package com.rmb938.mn2.docker.db.entity;
 import lombok.Getter;
 import lombok.Setter;
 
-public class Node extends Entity {
+public class MN2Node extends MN2Entity {
 
     @Getter
     @Setter

@@ -6,7 +6,7 @@ import org.bson.types.ObjectId;
 
 import java.util.HashMap;
 
-public class Plugin extends Entity {
+public class MN2Plugin extends MN2Entity {
 
     @Getter
     @Setter
@@ -27,11 +27,26 @@ public class Plugin extends Entity {
     @Getter
     private HashMap<ObjectId, PluginConfig> configs = new HashMap<>();
 
+    public PluginConfig newPluginConfig() {
+        return new PluginConfig();
+    }
+
     public enum PluginType {
 
         BUKKIT,
         BUNGEE
 
+    }
+
+    public class PluginConfig extends MN2Entity {
+
+        @Getter
+        @Setter
+        private String name;
+
+        @Getter
+        @Setter
+        private String location;
     }
 
 }
