@@ -32,6 +32,32 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         return getDb().count(getCollection(), new BasicDBObject("$and", and));
     }
 
+    public int getNextNumber(MN2ServerType serverType) {
+        BasicDBList and = new BasicDBList();
+        and.add(new BasicDBObject("_servertype", serverType.get_id()));
+        and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$lt", System.currentTimeMillis()-60000)));
+        DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("$and", and));
+        dbCursor.sort(new BasicDBObject("number", 1));
+        int number = 1;
+        if (dbCursor.size() > 0) {
+            DBObject dbObject = dbCursor.next();
+            number = (Integer) dbObject.get("number");
+        } else {
+            and = new BasicDBList();
+            and.add(new BasicDBObject("_servertype", serverType.get_id()));
+            and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis()-60000)));
+            dbCursor = getDb().findMany(getCollection(), new BasicDBObject("$and", and));
+            dbCursor.sort(new BasicDBObject("number", -1));
+            if (dbCursor.size() > 0) {
+                DBObject dbObject = dbCursor.next();
+                number = (Integer) dbObject.get("number");
+                number += 1;
+            }
+        }
+
+        return number;
+    }
+
     public ArrayList<MN2Server> nodeServers(MN2Node node) {
         ArrayList<MN2Server> servers = new ArrayList<>();
 
