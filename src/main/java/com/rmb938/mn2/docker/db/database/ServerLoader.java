@@ -111,6 +111,7 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         BasicDBObject values = new BasicDBObject();
         values.put("lastUpdate", server.getLastUpdate());
         values.put("containerId", server.getContainerId());
+        values.put("port", server.getPort());
 
         BasicDBObject set = new BasicDBObject("$set", values);
         getDb().updateDocument(getCollection(), new BasicDBObject("_id", server.get_id()), set);
@@ -124,6 +125,7 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         dbObject.append("_node", server.getNode().get_id());
         dbObject.append("lastUpdate", 0L);
         dbObject.append("containerId", "NULL");
+        dbObject.append("port", -1);
         dbObject.append("number", getNextNumber(server.getServerType()));
         getDb().insert(getCollection(), dbObject);
         return (ObjectId) dbObject.get("_id");
