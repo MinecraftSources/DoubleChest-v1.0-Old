@@ -48,16 +48,8 @@ public class MongoDatabase {
     }
 
     public DBObject findOne(String collection, DBObject query) {
-        DBObject dbObject;
         DBCollection dbCollection = getCollection(collection);
-        DBCursor dbCursor = dbCollection.find(query).limit(1);
-        if (dbCursor.hasNext() == false) {
-            return null;
-        }
-        dbObject = dbCursor.next();
-        dbCursor.close();
-
-        return dbObject;
+        return dbCollection.findOne(query);
     }
 
     public void remove(String collection, DBObject query) {

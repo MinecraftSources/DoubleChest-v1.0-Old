@@ -33,28 +33,38 @@ public class ServerLoader extends EntityLoader<MN2Server> {
     }
 
     public int getNextNumber(MN2ServerType serverType) {
+        int number = 1;
+
         BasicDBList and = new BasicDBList();
         and.add(new BasicDBObject("_servertype", serverType.get_id()));
-        and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$lt", System.currentTimeMillis() - 60000)));
+        and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis() - 60000)));
+
         DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("$and", and));
-        dbCursor.sort(new BasicDBObject("number", 1));
-        int number = 1;
-        if (dbCursor.size() > 0) {
+        dbCursor.sort(new BasicDBObject("number", -1));
+        DBObject lastObj = null;
+
+        while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
-            number = (Integer) dbObject.get("number");
-        } else {
-            and = new BasicDBList();
-            and.add(new BasicDBObject("_servertype", serverType.get_id()));
-            and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis() - 60000)));
-            dbCursor = getDb().findMany(getCollection(), new BasicDBObject("$and", and));
-            dbCursor.sort(new BasicDBObject("number", -1));
-            if (dbCursor.size() > 0) {
-                DBObject dbObject = dbCursor.next();
-                number = (Integer) dbObject.get("number");
-                number += 1;
+
+            if (lastObj != null) {
+                int currentNumber = (Integer) dbObject.get("number");
+                int lastNumber = (Integer) lastObj.get("number");
+                if (currentNumber - lastNumber > 1) {
+                    number = (currentNumber - lastNumber) + 1;
+                    break;
+                }
+            } else {
+                int currentNumber = (Integer) dbObject.get("number");
+                if (currentNumber - number > 1) {
+                    number = currentNumber - number;
+                    break;
+                }
             }
+            lastObj = dbObject;
+            number += 1;
         }
 
+        dbCursor.close();
         return number;
     }
 
@@ -72,7 +82,7 @@ public class ServerLoader extends EntityLoader<MN2Server> {
                 servers.add(server);
             }
         }
-
+        dbCursor.close();
         return servers;
     }
 
