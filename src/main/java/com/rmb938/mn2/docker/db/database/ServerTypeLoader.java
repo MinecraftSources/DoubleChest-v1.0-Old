@@ -20,10 +20,10 @@ public class ServerTypeLoader extends EntityLoader<MN2ServerType> {
     private final PluginLoader pluginLoader;
     private final WorldLoader worldLoader;
 
-    public ServerTypeLoader(MongoDatabase db) {
+    public ServerTypeLoader(MongoDatabase db, PluginLoader pluginLoader, WorldLoader worldLoader) {
         super(db, "servertypes");
-        pluginLoader = new PluginLoader(db);
-        worldLoader = new WorldLoader(db);
+        this.pluginLoader = pluginLoader;
+        this.worldLoader = worldLoader;
     }
 
     public ArrayList<MN2ServerType> getTypes() {
