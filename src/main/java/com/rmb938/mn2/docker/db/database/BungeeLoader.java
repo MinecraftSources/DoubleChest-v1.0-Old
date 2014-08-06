@@ -5,6 +5,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.rmb938.mn2.docker.db.entity.MN2Bungee;
+import com.rmb938.mn2.docker.db.entity.MN2BungeeType;
 import com.rmb938.mn2.docker.db.entity.MN2Node;
 import com.rmb938.mn2.docker.db.entity.MN2Server;
 import com.rmb938.mn2.docker.db.mongo.MongoDatabase;
@@ -41,6 +42,15 @@ public class BungeeLoader extends EntityLoader<MN2Bungee> {
         }
         dbCursor.close();
         return bungees;
+    }
+
+    public MN2Bungee nodeBungeeType(MN2Node node, MN2BungeeType bungeeType) {
+        BasicDBList and = new BasicDBList();
+        and.add(new BasicDBObject("_node", node.get_id()));
+        and.add(new BasicDBObject("_bungeetype", bungeeType.get_id()));
+        and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis() - 60000)));
+        DBObject dbObject= getDb().findOne(getCollection(), new BasicDBObject("$and", and));
+        return loadEntity((ObjectId) dbObject.get("_id"));
     }
 
     @Override
