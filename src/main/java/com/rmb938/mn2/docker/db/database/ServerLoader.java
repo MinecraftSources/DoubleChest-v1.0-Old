@@ -45,46 +45,17 @@ public class ServerLoader extends EntityLoader<MN2Server> {
     }
 
     public Long getCount(MN2ServerType serverType) {
-        BasicDBList and = new BasicDBList();
-        and.add(new BasicDBObject("_servertype", serverType.get_id()));
-        and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis() - 60000)));
-        return getDb().count(getCollection(), new BasicDBObject("$and", and));
+        return getDb().count(getCollection(), new BasicDBObject("_servertype", serverType.get_id()));
     }
 
     public long getNextNumber(MN2ServerType serverType) {
-        long number;
-
-        BasicDBList and = new BasicDBList();
-        and.add(new BasicDBObject("_servertype", serverType.get_id()));
-        and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$lt", System.currentTimeMillis() - 60000)));
-
-        DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("$and", and));
-        BasicDBObject sort = new BasicDBObject();
-        sort.put("_servertype", 1);
-        sort.put("number", 1);
-        dbCursor.sort(sort);
-
-        if (dbCursor.size() > 0) {//get the first one which is the lowest number and remove that document so a new one can be inserted
-            DBObject dbObject = dbCursor.next();
-            number = (Integer) dbObject.get("number");
-
-            getDb().remove(getCollection(), new BasicDBObject("_id", dbObject.get("_id")));
-        } else {//if the cursor is empty
-            and.add(new BasicDBObject("_servertype", serverType.get_id()));
-            and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis() - 60000)));
-            number = getDb().count(getCollection(), new BasicDBObject("$and", and)) + 1;
-        }
-        dbCursor.close();
-        return number;
+        return getDb().count(getCollection(), new BasicDBObject("_servertype", serverType.get_id())) + 1;
     }
 
     public ArrayList<MN2Server> nodeServers(MN2Node node) {
         ArrayList<MN2Server> servers = new ArrayList<>();
 
-        BasicDBList and = new BasicDBList();
-        and.add(new BasicDBObject("_node", node.get_id()));
-        and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis() - 60000)));
-        DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("$and", and));
+        DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("_node", node.get_id()));
         while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
             MN2Server server = loadEntity((ObjectId) dbObject.get("_id"));

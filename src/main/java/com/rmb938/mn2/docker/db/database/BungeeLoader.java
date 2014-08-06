@@ -28,11 +28,7 @@ public class BungeeLoader extends EntityLoader<MN2Bungee> {
 
     public ArrayList<MN2Bungee> nodeBungees(MN2Node node) {
         ArrayList<MN2Bungee> bungees = new ArrayList<>();
-
-        BasicDBList and = new BasicDBList();
-        and.add(new BasicDBObject("_node", node.get_id()));
-        and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis() - 60000)));
-        DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("$and", and));
+        DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("_node", node.get_id()));
         while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
             MN2Bungee bungee = loadEntity((ObjectId) dbObject.get("_id"));
@@ -48,7 +44,6 @@ public class BungeeLoader extends EntityLoader<MN2Bungee> {
         BasicDBList and = new BasicDBList();
         and.add(new BasicDBObject("_node", node.get_id()));
         and.add(new BasicDBObject("_bungeetype", bungeeType.get_id()));
-        and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis() - 60000)));
         DBObject dbObject= getDb().findOne(getCollection(), new BasicDBObject("$and", and));
         return loadEntity((ObjectId) dbObject.get("_id"));
     }
