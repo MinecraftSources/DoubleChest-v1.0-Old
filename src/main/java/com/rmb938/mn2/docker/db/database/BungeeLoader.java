@@ -55,7 +55,7 @@ public class BungeeLoader extends EntityLoader<MN2Bungee> {
         BasicDBObject dbObject = new BasicDBObject("_id", new ObjectId());
         dbObject.append("_bungeetype", entity.getBungeeType().get_id());
         dbObject.append("_node", entity.getNode().get_id());
-        dbObject.append("lastUpdate", 0L);
+        dbObject.append("lastUpdate", entity.getLastUpdate());
         dbObject.append("containerId", "NULL");
         getDb().insert(getCollection(), dbObject);
         return (ObjectId) dbObject.get("_id");
