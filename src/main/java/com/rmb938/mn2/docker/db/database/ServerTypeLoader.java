@@ -36,6 +36,7 @@ public class ServerTypeLoader extends EntityLoader<MN2ServerType> {
                 types.add(type);
             }
         }
+        dbCursor.close();
         return types;
     }
 

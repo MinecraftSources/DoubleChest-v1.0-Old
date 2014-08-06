@@ -74,7 +74,7 @@ public class ServerLoader extends EntityLoader<MN2Server> {
             and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis() - 60000)));
             number = getDb().count(getCollection(), new BasicDBObject("$and", and)) + 1;
         }
-
+        dbCursor.close();
         return number;
     }
 

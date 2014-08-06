@@ -1,11 +1,17 @@
 package com.rmb938.mn2.docker.db.database;
 
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.rmb938.mn2.docker.db.entity.MN2Bungee;
+import com.rmb938.mn2.docker.db.entity.MN2Node;
+import com.rmb938.mn2.docker.db.entity.MN2Server;
 import com.rmb938.mn2.docker.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
+
+import java.util.ArrayList;
 
 @Log4j2
 public class BungeeLoader extends EntityLoader<MN2Bungee> {
@@ -17,6 +23,24 @@ public class BungeeLoader extends EntityLoader<MN2Bungee> {
         super(db, "bungees");
         this.bungeeTypeLoader = bungeeTypeLoader;
         this.nodeLoader = nodeLoader;
+    }
+
+    public ArrayList<MN2Bungee> nodeBungees(MN2Node node) {
+        ArrayList<MN2Bungee> bungees = new ArrayList<>();
+
+        BasicDBList and = new BasicDBList();
+        and.add(new BasicDBObject("_node", node.get_id()));
+        and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis() - 60000)));
+        DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("$and", and));
+        while (dbCursor.hasNext()) {
+            DBObject dbObject = dbCursor.next();
+            MN2Bungee bungee = loadEntity((ObjectId) dbObject.get("_id"));
+            if (bungee != null) {
+                bungees.add(bungee);
+            }
+        }
+        dbCursor.close();
+        return bungees;
     }
 
     @Override

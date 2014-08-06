@@ -2,6 +2,7 @@ package com.rmb938.mn2.docker.db.database;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.rmb938.mn2.docker.db.entity.*;
 import com.rmb938.mn2.docker.db.mongo.MongoDatabase;
@@ -9,6 +10,7 @@ import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
 
 import java.util.AbstractMap;
+import java.util.ArrayList;
 
 @Log4j2
 public class BungeeTypeLoader extends EntityLoader<MN2BungeeType> {
@@ -22,6 +24,33 @@ public class BungeeTypeLoader extends EntityLoader<MN2BungeeType> {
         this.pluginLoader = pluginLoader;
         this.nodeLoader = nodeLoader;
         this.serverTypeLoader = serverTypeLoader;
+    }
+
+    public ArrayList<MN2BungeeType> getTypes() {
+        ArrayList<MN2BungeeType> types = new ArrayList<>();
+        DBCursor dbCursor = getDb().findMany(getCollection());
+        while (dbCursor.hasNext()) {
+            DBObject dbObject = dbCursor.next();
+            MN2BungeeType type = loadEntity((ObjectId)dbObject.get("_id"));
+            if (type != null) {
+                types.add(type);
+            }
+        }
+        return types;
+    }
+
+    public ArrayList<MN2BungeeType> getTypes(MN2Node node) {
+        ArrayList<MN2BungeeType> types = new ArrayList<>();
+        DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("nodes", new BasicDBObject("$elemMatch", node.get_id())));
+        while (dbCursor.hasNext()) {
+            DBObject dbObject = dbCursor.next();
+            MN2BungeeType type = loadEntity((ObjectId)dbObject.get("_id"));
+            if (type != null) {
+                types.add(type);
+            }
+        }
+        dbCursor.close();
+        return types;
     }
 
     @Override
