@@ -100,4 +100,14 @@ public class MongoDatabase {
         dbCollection.update(query, document);
     }
 
+    public void createIndex(String collection, DBObject keys) {
+        DBCollection dbCollection = getCollection(collection);
+        dbCollection.createIndex(keys);
+    }
+
+    public void createIndex(String collection, DBObject keys, DBObject options) {
+        DBCollection dbCollection = getCollection(collection);
+        dbCollection.createIndex(keys, options);
+    }
+
 }

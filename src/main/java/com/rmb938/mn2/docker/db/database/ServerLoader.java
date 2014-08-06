@@ -23,6 +23,25 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         super(db, "servers");
         this.nodeLoader = nodeLoader;
         this.serverTypeLoader = serverTypeLoader;
+
+        //servertype index
+        BasicDBObject index = new BasicDBObject();
+        index.put("_servertype", 1);
+        getDb().createIndex(getCollection(), index);
+
+        //servertype and lastUpdate index
+        index = new BasicDBObject();
+        index.put("_servertype", 1);
+        index.put("lastUpdate", 1);
+        getDb().createIndex(getCollection(), index);
+
+        //servertype and number index
+        index = new BasicDBObject();
+        BasicDBObject options = new BasicDBObject();
+        options.put("unique", true);
+        index.put("_servertype", 1);
+        index.put("number", 1);
+        getDb().createIndex(getCollection(), index, options);
     }
 
     public Long getCount(MN2ServerType serverType) {
@@ -32,39 +51,30 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         return getDb().count(getCollection(), new BasicDBObject("$and", and));
     }
 
-    public int getNextNumber(MN2ServerType serverType) {
-        int number = 1;
+    public long getNextNumber(MN2ServerType serverType) {
+        long number;
 
         BasicDBList and = new BasicDBList();
         and.add(new BasicDBObject("_servertype", serverType.get_id()));
-        and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis() - 60000)));
+        and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$lt", System.currentTimeMillis() - 60000)));
 
         DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("$and", and));
-        dbCursor.sort(new BasicDBObject("number", -1));
-        DBObject lastObj = null;
+        BasicDBObject sort = new BasicDBObject();
+        sort.put("_servertype", 1);
+        sort.put("number", 1);
+        dbCursor.sort(sort);
 
-        while (dbCursor.hasNext()) {
+        if (dbCursor.size() > 0) {//get the first one which is the lowest number and remove that document so a new one can be inserted
             DBObject dbObject = dbCursor.next();
+            number = (Integer) dbObject.get("number");
 
-            if (lastObj != null) {
-                int currentNumber = (Integer) dbObject.get("number");
-                int lastNumber = (Integer) lastObj.get("number");
-                if (currentNumber - lastNumber > 1) {
-                    number = (currentNumber - lastNumber) + 1;
-                    break;
-                }
-            } else {
-                int currentNumber = (Integer) dbObject.get("number");
-                if (currentNumber - number > 1) {
-                    number = currentNumber - number;
-                    break;
-                }
-            }
-            lastObj = dbObject;
-            number += 1;
+            getDb().remove(getCollection(), new BasicDBObject("_id", dbObject.get("_id")));
+        } else {//if the cursor is empty
+            and.add(new BasicDBObject("_servertype", serverType.get_id()));
+            and.add(new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis() - 60000)));
+            number = getDb().count(getCollection(), new BasicDBObject("$and", and)) + 1;
         }
 
-        dbCursor.close();
         return number;
     }
 
@@ -133,7 +143,7 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         BasicDBObject dbObject = new BasicDBObject("_id", new ObjectId());
         dbObject.append("_servertype", server.getServerType().get_id());
         dbObject.append("_node", server.getNode().get_id());
-        dbObject.append("lastUpdate", 0L);
+        dbObject.append("lastUpdate", server.getLastUpdate());
         dbObject.append("containerId", "NULL");
         dbObject.append("port", -1);
         dbObject.append("number", getNextNumber(server.getServerType()));
