@@ -49,7 +49,18 @@ public class ServerLoader extends EntityLoader<MN2Server> {
     }
 
     public long getNextNumber(MN2ServerType serverType) {
-        return getDb().count(getCollection(), new BasicDBObject("_servertype", serverType.get_id())) + 1;
+        int number = 1;
+        BasicDBList and = new BasicDBList();
+        and.add(new BasicDBObject("_servertype", serverType.get_id()));
+        and.add(new BasicDBObject("number", number));
+        while (true) {
+            DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("$and", and));
+            if (dbObject == null) {
+                break;
+            }
+            number += 1;
+        }
+        return number;
     }
 
     public ArrayList<MN2Server> nodeServers(MN2Node node) {
