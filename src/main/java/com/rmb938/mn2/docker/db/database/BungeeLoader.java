@@ -58,18 +58,8 @@ public class BungeeLoader extends EntityLoader<MN2Bungee> {
         if (dbObject != null) {
             MN2Bungee bungee = new MN2Bungee();
             bungee.set_id((ObjectId) dbObject.get("_id"));
-            MN2BungeeType bungeeType = bungeeTypeLoader.loadEntity((ObjectId) dbObject.get("_bungeetype"));
-            if (bungeeType == null) {
-                log.error("Error loading bungee type for bungee "+bungee.get_id());
-                return null;
-            }
-            bungee.setBungeeType(bungeeType);
-            MN2Node node = nodeLoader.loadEntity((ObjectId) dbObject.get("_node"));
-            if (node == null) {
-                log.error("Error loading node for bungee "+bungee.get_id());
-                return null;
-            }
-            bungee.setNode(node);
+            bungee.setBungeeType(bungeeTypeLoader.loadEntity((ObjectId) dbObject.get("_bungeetype")));
+            bungee.setNode(nodeLoader.loadEntity((ObjectId) dbObject.get("_node")));
             bungee.setLastUpdate((Long) dbObject.get("lastUpdate"));
             bungee.setContainerId((String) dbObject.get("containerId"));
 
