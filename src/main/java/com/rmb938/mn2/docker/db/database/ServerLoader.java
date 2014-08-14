@@ -89,9 +89,18 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("_id", _id));
         if (dbObject != null) {
             MN2Server server = new MN2Server();
-            server.set_id((ObjectId) dbObject.get("_id"));
-            server.setServerType(serverTypeLoader.loadEntity((ObjectId) dbObject.get("_servertype")));
-            server.setNode(nodeLoader.loadEntity((ObjectId) dbObject.get("_node")));
+            server.set_id((ObjectId) dbObject.get("_id"));MN2ServerType serverType = serverTypeLoader.loadEntity((ObjectId) dbObject.get("_servertype"));
+            if (serverType == null) {
+                log.error("Error loading server type for server "+server.get_id());
+                return null;
+            }
+            server.setServerType(serverType);
+            MN2Node node = nodeLoader.loadEntity((ObjectId) dbObject.get("_node"));
+            if (node == null) {
+                log.error("Error loading node for server "+server.get_id());
+                return null;
+            }
+            server.setNode(node);
             server.setContainerId((String) dbObject.get("containerId"));
             server.setLastUpdate((Long) dbObject.get("lastUpdate"));
             server.setNumber((Integer) dbObject.get("number"));
