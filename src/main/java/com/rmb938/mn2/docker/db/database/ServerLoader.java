@@ -48,12 +48,14 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         return getDb().count(getCollection(), new BasicDBObject("_servertype", serverType.get_id()));
     }
 
-    public long getNextNumber(MN2ServerType serverType) {
+    public int getNextNumber(MN2ServerType serverType) {
         int number = 1;
         BasicDBList and = new BasicDBList();
         and.add(new BasicDBObject("_servertype", serverType.get_id()));
         and.add(new BasicDBObject("number", number));
         while (true) {
+            and.remove(1);
+            and.add(new BasicDBObject("number", number));
             DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("$and", and));
             if (dbObject == null) {
                 break;

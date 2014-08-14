@@ -41,7 +41,7 @@ public class BungeeTypeLoader extends EntityLoader<MN2BungeeType> {
 
     public ArrayList<MN2BungeeType> getTypes(MN2Node node) {
         ArrayList<MN2BungeeType> types = new ArrayList<>();
-        DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("nodes", new BasicDBObject("$elemMatch", node.get_id())));
+        DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("nodes", new BasicDBObject("$elemMatch", new BasicDBObject("_id", node.get_id()))));
         while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
             MN2BungeeType type = loadEntity((ObjectId)dbObject.get("_id"));
