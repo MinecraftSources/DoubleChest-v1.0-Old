@@ -98,7 +98,7 @@ public class BungeeTypeLoader extends EntityLoader<MN2BungeeType> {
             }
             return bungeeType;
         }
-        log.info("Unknown Server Type "+_id.toString());
+        log.info("Unknown Bungee Type "+_id.toString());
         return null;
     }
 
