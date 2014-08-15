@@ -59,6 +59,7 @@ public class NodeLoader extends EntityLoader<MN2Node> {
 
             return node;
         }
+        log.info("Unknown Node "+_id.toString());
         return null;
     }
 
