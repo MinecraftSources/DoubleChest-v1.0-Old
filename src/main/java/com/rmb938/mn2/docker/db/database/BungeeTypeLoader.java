@@ -16,13 +16,11 @@ import java.util.ArrayList;
 public class BungeeTypeLoader extends EntityLoader<MN2BungeeType> {
 
     private final PluginLoader pluginLoader;
-    private final NodeLoader nodeLoader;
     private final ServerTypeLoader serverTypeLoader;
 
-    public BungeeTypeLoader(MongoDatabase db, PluginLoader pluginLoader, NodeLoader nodeLoader, ServerTypeLoader serverTypeLoader) {
+    public BungeeTypeLoader(MongoDatabase db, PluginLoader pluginLoader, ServerTypeLoader serverTypeLoader) {
         super(db, "bungeetypes");
         this.pluginLoader = pluginLoader;
-        this.nodeLoader = nodeLoader;
         this.serverTypeLoader = serverTypeLoader;
     }
 
@@ -36,20 +34,6 @@ public class BungeeTypeLoader extends EntityLoader<MN2BungeeType> {
                 types.add(type);
             }
         }
-        return types;
-    }
-
-    public ArrayList<MN2BungeeType> getTypes(MN2Node node) {
-        ArrayList<MN2BungeeType> types = new ArrayList<>();
-        DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("nodes", new BasicDBObject("$elemMatch", new BasicDBObject("_id", node.get_id()))));
-        while (dbCursor.hasNext()) {
-            DBObject dbObject = dbCursor.next();
-            MN2BungeeType type = loadEntity((ObjectId)dbObject.get("_id"));
-            if (type != null) {
-                types.add(type);
-            }
-        }
-        dbCursor.close();
         return types;
     }
 
@@ -89,18 +73,6 @@ public class BungeeTypeLoader extends EntityLoader<MN2BungeeType> {
                     }
                 }
                 bungeeType.getPlugins().add(new AbstractMap.SimpleEntry<MN2Plugin, MN2Plugin.PluginConfig>(plugin, pluginConfig));
-            }
-
-            BasicDBList nodes = (BasicDBList) dbObject.get("nodes");
-            for (Object obj : nodes) {
-                DBObject dbObj = (DBObject) obj;
-                ObjectId _nodeId = (ObjectId) dbObj.get("_id");
-                MN2Node node = nodeLoader.loadEntity(_nodeId);
-                if (node == null) {
-                    log.error("Error loading node for bungee "+bungeeType.getName());
-                    return null;
-                }
-                bungeeType.getNodes().add(node);
             }
 
             BasicDBList servertypes = (BasicDBList) dbObject.get("servertypes");

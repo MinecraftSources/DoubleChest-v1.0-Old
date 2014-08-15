@@ -23,7 +23,4 @@ public class MN2BungeeType extends MN2Entity {
     @Getter
     private ArrayList<MN2ServerType> serverTypes = new ArrayList<>();
 
-    @Getter
-    private ArrayList<MN2Node> nodes = new ArrayList<>();
-
 }

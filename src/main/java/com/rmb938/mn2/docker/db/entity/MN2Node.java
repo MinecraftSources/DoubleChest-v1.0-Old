@@ -3,6 +3,8 @@ package com.rmb938.mn2.docker.db.entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+
 public class MN2Node extends MN2Entity {
 
     @Getter
@@ -13,8 +15,11 @@ public class MN2Node extends MN2Entity {
     @Setter
     private long lastUpdate = 0L;
 
-
     @Getter
     @Setter
     private int ram;
+
+    @Getter
+    @Setter
+    private MN2BungeeType bungeeType;
 }
