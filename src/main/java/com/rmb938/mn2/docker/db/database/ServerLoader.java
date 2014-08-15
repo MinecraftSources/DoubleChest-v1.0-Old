@@ -5,6 +5,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.rmb938.mn2.docker.db.entity.MN2Node;
+import com.rmb938.mn2.docker.db.entity.MN2Player;
 import com.rmb938.mn2.docker.db.entity.MN2Server;
 import com.rmb938.mn2.docker.db.entity.MN2ServerType;
 import com.rmb938.mn2.docker.db.mongo.MongoDatabase;
@@ -12,6 +13,7 @@ import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 @Log4j2
 public class ServerLoader extends EntityLoader<MN2Server> {
@@ -100,7 +102,7 @@ public class ServerLoader extends EntityLoader<MN2Server> {
             BasicDBList players = (BasicDBList) dbObject.get("players");
             if (players != null) {
                 for (Object object : players) {
-                    String uuid = (String) object;
+                    ObjectId _playerId = (ObjectId) object;
                     //load player entity and add
                 }
             }
@@ -117,6 +119,10 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         values.put("containerId", server.getContainerId());
         values.put("port", server.getPort());
 
+        BasicDBList players = server.getPlayers().stream().map(MN2Player::get_id).collect(Collectors.toCollection(BasicDBList::new));
+
+        values.put("players", players);
+
         BasicDBObject set = new BasicDBObject("$set", values);
         getDb().updateDocument(getCollection(), new BasicDBObject("_id", server.get_id()), set);
         log.info("Saving Server " + server.get_id());
@@ -130,6 +136,7 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         dbObject.append("lastUpdate", server.getLastUpdate());
         dbObject.append("containerId", "NULL");
         dbObject.append("port", -1);
+        dbObject.append("players", new BasicDBList());
         dbObject.append("number", getNextNumber(server.getServerType()));
         getDb().insert(getCollection(), dbObject);
         return (ObjectId) dbObject.get("_id");
