@@ -40,7 +40,7 @@ public class BungeeTypeLoader extends EntityLoader<MN2BungeeType> {
     @Override
     public MN2BungeeType loadEntity(ObjectId _id) {
         if (_id == null) {
-            log.error("Error loading server type. _id null");
+            log.error("Error loading bungee. _id null");
             return null;
         }
         DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("_id", _id));

@@ -52,8 +52,10 @@ public class NodeLoader extends EntityLoader<MN2Node> {
             }
 
             ObjectId _bungeeTypeId = (ObjectId) dbObject.get("_bungeeType");
-            MN2BungeeType bungeeType = bungeeTypeLoader.loadEntity(_bungeeTypeId);
-            node.setBungeeType(bungeeType);
+            if (_bungeeTypeId != null) {
+                MN2BungeeType bungeeType = bungeeTypeLoader.loadEntity(_bungeeTypeId);
+                node.setBungeeType(bungeeType);
+            }
 
             return node;
         }

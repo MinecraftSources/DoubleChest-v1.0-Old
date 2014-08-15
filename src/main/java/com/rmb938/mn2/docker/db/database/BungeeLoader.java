@@ -37,7 +37,7 @@ public class BungeeLoader extends EntityLoader<MN2Bungee> {
     @Override
     public MN2Bungee loadEntity(ObjectId _id) {
         if (_id == null) {
-            log.error("Error loading world. _id null");
+            log.error("Error loading bungee. _id null");
             return null;
         }
         DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("_id", _id));

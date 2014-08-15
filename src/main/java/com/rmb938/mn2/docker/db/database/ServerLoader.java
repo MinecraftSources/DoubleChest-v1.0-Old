@@ -83,7 +83,7 @@ public class ServerLoader extends EntityLoader<MN2Server> {
     @Override
     public MN2Server loadEntity(ObjectId _id) {
         if (_id == null) {
-            log.error("Error loading world. _id null");
+            log.error("Error loading server. _id null");
             return null;
         }
         DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("_id", _id));
