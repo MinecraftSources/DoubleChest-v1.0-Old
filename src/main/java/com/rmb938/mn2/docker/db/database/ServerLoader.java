@@ -13,7 +13,6 @@ import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 @Log4j2
 public class ServerLoader extends EntityLoader<MN2Server> {
@@ -100,11 +99,10 @@ public class ServerLoader extends EntityLoader<MN2Server> {
             server.setPort((Integer) dbObject.get("port"));
 
             BasicDBList players = (BasicDBList) dbObject.get("players");
-            if (players != null) {
-                for (Object object : players) {
-                    ObjectId _playerId = (ObjectId) object;
-                    //load player entity and add
-                }
+            for (Object object : players) {
+                DBObject dbObj = (DBObject) object;
+                ObjectId _playerId = (ObjectId) dbObj.get("_id");
+                //load player entity and add
             }
 
             return server;
@@ -119,7 +117,11 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         values.put("containerId", server.getContainerId());
         values.put("port", server.getPort());
 
-        BasicDBList players = server.getPlayers().stream().map(MN2Player::get_id).collect(Collectors.toCollection(BasicDBList::new));
+        BasicDBList players = new BasicDBList();
+        for (MN2Player player : server.getPlayers()) {
+            BasicDBObject dbObject = new BasicDBObject("_id", player.get_id());
+            players.add(dbObject);
+        }
 
         values.put("players", players);
 

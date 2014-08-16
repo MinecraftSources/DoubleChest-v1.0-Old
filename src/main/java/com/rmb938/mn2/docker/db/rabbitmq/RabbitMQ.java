@@ -16,7 +16,7 @@ public class RabbitMQ {
         factory = new ConnectionFactory();
         factory.setUsername(username);
         factory.setPassword(password);
-        factory.setRequestedHeartbeat(15);
+        factory.setRequestedHeartbeat(25);
         factory.setConnectionTimeout(5000);
         factory.setNetworkRecoveryInterval(0);
         factory.setAutomaticRecoveryEnabled(true);
