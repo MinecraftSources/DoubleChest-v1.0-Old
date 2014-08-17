@@ -30,6 +30,10 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         index.put("_servertype", 1);
         getDb().createIndex(getCollection(), index);
 
+        //node index
+        index.put("_node", 1);
+        getDb().createIndex(getCollection(), index);
+
         //servertype and lastUpdate index
         index = new BasicDBObject();
         index.put("_servertype", 1);
@@ -70,6 +74,21 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         ArrayList<MN2Server> servers = new ArrayList<>();
 
         DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("_node", node.get_id()));
+        while (dbCursor.hasNext()) {
+            DBObject dbObject = dbCursor.next();
+            MN2Server server = loadEntity((ObjectId) dbObject.get("_id"));
+            if (server != null) {
+                servers.add(server);
+            }
+        }
+        dbCursor.close();
+        return servers;
+    }
+
+    public ArrayList<MN2Server> typeServers(MN2ServerType serverType) {
+        ArrayList<MN2Server> servers = new ArrayList<>();
+
+        DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("_servertype", serverType.get_id()));
         while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
             MN2Server server = loadEntity((ObjectId) dbObject.get("_id"));
