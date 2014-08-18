@@ -70,10 +70,25 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         return number;
     }
 
-    public ArrayList<MN2Server> nodeServers(MN2Node node) {
+    public ArrayList<MN2Server> getNodeServers(MN2Node node) {
         ArrayList<MN2Server> servers = new ArrayList<>();
 
         DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("_node", node.get_id()));
+        while (dbCursor.hasNext()) {
+            DBObject dbObject = dbCursor.next();
+            MN2Server server = loadEntity((ObjectId) dbObject.get("_id"));
+            if (server != null) {
+                servers.add(server);
+            }
+        }
+        dbCursor.close();
+        return servers;
+    }
+
+    public ArrayList<MN2Server> getServers() {
+        ArrayList<MN2Server> servers = new ArrayList<>();
+
+        DBCursor dbCursor = getDb().findMany(getCollection());
         while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
             MN2Server server = loadEntity((ObjectId) dbObject.get("_id"));

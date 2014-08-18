@@ -1,6 +1,5 @@
 package com.rmb938.mn2.docker.db.database;
 
-import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
@@ -9,6 +8,8 @@ import com.rmb938.mn2.docker.db.entity.MN2Node;
 import com.rmb938.mn2.docker.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
+
+import java.util.ArrayList;
 
 @Log4j2
 public class NodeLoader extends EntityLoader<MN2Node> {
@@ -30,6 +31,32 @@ public class NodeLoader extends EntityLoader<MN2Node> {
             return node;
         }
         return null;
+    }
+
+    public ArrayList<MN2Node> getNodes() {
+        ArrayList<MN2Node> nodes = new ArrayList<>();
+        DBCursor dbCursor = getDb().findMany(getCollection());
+        if (dbCursor.hasNext()) {
+            DBObject dbObject = dbCursor.next();
+            MN2Node node = loadEntity((ObjectId)dbObject.get("_id"));
+            if (node != null) {
+                nodes.add(node);
+            }
+        }
+        return nodes;
+    }
+
+    public ArrayList<MN2Node> getOnlineNodes() {
+        ArrayList<MN2Node> nodes = new ArrayList<>();
+        DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis()-30000)));
+        if (dbCursor.hasNext()) {
+            DBObject dbObject = dbCursor.next();
+            MN2Node node = loadEntity((ObjectId)dbObject.get("_id"));
+            if (node != null) {
+                nodes.add(node);
+            }
+        }
+        return nodes;
     }
 
     @Override
