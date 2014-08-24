@@ -47,6 +47,7 @@ public class BungeeTypeLoader extends EntityLoader<MN2BungeeType> {
         if (dbObject != null) {
             MN2BungeeType bungeeType = new MN2BungeeType();
             bungeeType.set_id(_id);
+            bungeeType.setDbObject(dbObject);
             bungeeType.setName((String) dbObject.get("name"));
 
             BasicDBList plugins = (BasicDBList) dbObject.get("plugins");

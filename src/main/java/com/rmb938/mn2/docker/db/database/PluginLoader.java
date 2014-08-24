@@ -25,6 +25,7 @@ public class PluginLoader extends EntityLoader<MN2Plugin> {
         if (dbObject != null) {
             MN2Plugin plugin = new MN2Plugin();
             plugin.set_id(_id);
+            plugin.setDbObject(dbObject);
             plugin.setName((String) dbObject.get("name"));
             plugin.setBaseFolder((String) dbObject.get("baseFolder"));
             plugin.setConfigFolder((String) dbObject.get("configFolder"));

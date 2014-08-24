@@ -50,6 +50,7 @@ public class ServerTypeLoader extends EntityLoader<MN2ServerType> {
         if (dbObject != null) {
             MN2ServerType serverType = new MN2ServerType();
             serverType.set_id(_id);
+            serverType.setDbObject(dbObject);
             serverType.setName((String)dbObject.get("name"));
             serverType.setAmount((Integer)dbObject.get("amount"));
             serverType.setMemory((Integer)dbObject.get("memory"));

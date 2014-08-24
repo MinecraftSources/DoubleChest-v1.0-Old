@@ -24,6 +24,7 @@ public class WorldLoader extends EntityLoader<MN2World> {
         if (dbObject != null) {
             MN2World world = new MN2World();
             world.set_id(_id);
+            world.setDbObject(dbObject);
             world.setName((String) dbObject.get("name"));
             world.setFolder((String) dbObject.get("folder"));
             try {

@@ -69,6 +69,7 @@ public class NodeLoader extends EntityLoader<MN2Node> {
         if (dbObject != null) {
             MN2Node node = new MN2Node();
             node.set_id(_id);
+            node.setDbObject(dbObject);
             node.setAddress((String) dbObject.get("host"));
             node.setRam((Integer) dbObject.get("ram"));
             Object lastUpdate = dbObject.get("lastUpdate");
