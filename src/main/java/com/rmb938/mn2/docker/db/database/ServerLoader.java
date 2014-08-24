@@ -89,6 +89,8 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         ArrayList<MN2Server> servers = new ArrayList<>();
 
         DBCursor dbCursor = getDb().findMany(getCollection());
+        dbCursor.sort(new BasicDBObject("_servertype", -1));
+        dbCursor.sort(new BasicDBObject("number", -1));
         while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
             MN2Server server = loadEntity((ObjectId) dbObject.get("_id"));
