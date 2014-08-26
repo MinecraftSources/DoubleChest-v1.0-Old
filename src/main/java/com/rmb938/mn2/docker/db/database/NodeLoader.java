@@ -30,6 +30,7 @@ public class NodeLoader extends EntityLoader<MN2Node> {
             dbCursor.close();
             return node;
         }
+        dbCursor.close();
         return null;
     }
 
@@ -43,6 +44,7 @@ public class NodeLoader extends EntityLoader<MN2Node> {
                 nodes.add(node);
             }
         }
+        dbCursor.close();
         return nodes;
     }
 
@@ -56,6 +58,7 @@ public class NodeLoader extends EntityLoader<MN2Node> {
                 nodes.add(node);
             }
         }
+        dbCursor.close();
         return nodes;
     }
 

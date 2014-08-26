@@ -34,6 +34,7 @@ public class BungeeTypeLoader extends EntityLoader<MN2BungeeType> {
                 types.add(type);
             }
         }
+        dbCursor.close();
         return types;
     }
 

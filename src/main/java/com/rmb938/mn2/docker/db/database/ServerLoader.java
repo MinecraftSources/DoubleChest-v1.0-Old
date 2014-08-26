@@ -102,8 +102,12 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         return servers;
     }
 
-    public ArrayList<MN2Server> typeServers(MN2ServerType serverType) {
+    public ArrayList<MN2Server> getTypeServers(MN2ServerType serverType) {
         ArrayList<MN2Server> servers = new ArrayList<>();
+
+        if (serverType == null) {
+            return servers;
+        }
 
         DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("_servertype", serverType.get_id()));
         while (dbCursor.hasNext()) {
