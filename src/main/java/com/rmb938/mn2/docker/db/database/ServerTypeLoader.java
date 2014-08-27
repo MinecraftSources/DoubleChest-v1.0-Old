@@ -24,6 +24,11 @@ public class ServerTypeLoader extends EntityLoader<MN2ServerType> {
         super(db, "servertypes");
         this.pluginLoader = pluginLoader;
         this.worldLoader = worldLoader;
+
+        //name index
+        BasicDBObject index = new BasicDBObject();
+        index.put("name", 1);
+        getDb().createIndex(getCollection(), index);
     }
 
     public ArrayList<MN2ServerType> getTypes() {
@@ -55,6 +60,7 @@ public class ServerTypeLoader extends EntityLoader<MN2ServerType> {
             serverType.setAmount((Integer)dbObject.get("amount"));
             serverType.setMemory((Integer)dbObject.get("memory"));
             serverType.setPlayers((Integer)dbObject.get("players"));
+            serverType.setAllowRejoin((Boolean)dbObject.get("allowRejoin"));
 
             //log.info("Loading "+serverType.getName()+" plugins");
             BasicDBList plugins = (BasicDBList) dbObject.get("plugins");

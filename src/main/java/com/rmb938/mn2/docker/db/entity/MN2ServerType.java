@@ -31,6 +31,10 @@ public class MN2ServerType extends MN2Entity {
     private MN2World defaultWorld;
 
     @Getter
+    @Setter
+    private boolean allowRejoin;
+
+    @Getter
     private ArrayList<Map.Entry<MN2Plugin, MN2Plugin.PluginConfig>> plugins = new ArrayList<>();
 
     @Getter
