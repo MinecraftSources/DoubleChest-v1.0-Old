@@ -131,7 +131,6 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         if (dbObject != null) {
             MN2Server server = new MN2Server();
             server.set_id((ObjectId) dbObject.get("_id"));
-            server.setDbObject(dbObject);
             server.setServerType(serverTypeLoader.loadEntity((ObjectId) dbObject.get("_servertype")));
             server.setNode(nodeLoader.loadEntity((ObjectId) dbObject.get("_node")));
             server.setContainerId((String) dbObject.get("containerId"));

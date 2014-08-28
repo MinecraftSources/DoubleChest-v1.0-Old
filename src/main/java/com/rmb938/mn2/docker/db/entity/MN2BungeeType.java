@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class MN2BungeeType extends MN2Entity {
@@ -18,7 +19,7 @@ public class MN2BungeeType extends MN2Entity {
     private MN2ServerType defaultType;
 
     @Getter
-    private ArrayList<Map.Entry<MN2Plugin, MN2Plugin.PluginConfig>> plugins = new ArrayList<>();
+    private HashMap<MN2Plugin, MN2Plugin.PluginConfig> plugins = new HashMap<>();
 
     @Getter
     private ArrayList<MN2ServerType> serverTypes = new ArrayList<>();

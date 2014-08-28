@@ -2,17 +2,48 @@ package com.rmb938.mn2.docker.db.database;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.rmb938.mn2.docker.db.entity.MN2Plugin;
 import com.rmb938.mn2.docker.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
 
+import java.util.ArrayList;
+
 @Log4j2
 public class PluginLoader extends EntityLoader<MN2Plugin> {
 
     public PluginLoader(MongoDatabase db) {
         super(db, "plugins");
+    }
+
+    public ArrayList<MN2Plugin> loadPlugins() {
+        ArrayList<MN2Plugin> plugins = new ArrayList<>();
+        DBCursor dbCursor = getDb().findMany(getCollection());
+        while (dbCursor.hasNext()) {
+            DBObject dbObject = dbCursor.next();
+            MN2Plugin plugin = loadEntity((ObjectId) dbObject.get("_id"));
+            if (plugin != null) {
+                plugins.add(plugin);
+            }
+        }
+        dbCursor.close();
+        return plugins;
+    }
+
+    public ArrayList<MN2Plugin> loadPlugins(MN2Plugin.PluginType pluginType) {
+        ArrayList<MN2Plugin> plugins = new ArrayList<>();
+        DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("type", pluginType.name()));
+        while (dbCursor.hasNext()) {
+            DBObject dbObject = dbCursor.next();
+            MN2Plugin plugin = loadEntity((ObjectId) dbObject.get("_id"));
+            if (plugin != null) {
+                plugins.add(plugin);
+            }
+        }
+        dbCursor.close();
+        return plugins;
     }
 
     @Override
@@ -25,7 +56,6 @@ public class PluginLoader extends EntityLoader<MN2Plugin> {
         if (dbObject != null) {
             MN2Plugin plugin = new MN2Plugin();
             plugin.set_id(_id);
-            plugin.setDbObject(dbObject);
             plugin.setName((String) dbObject.get("name"));
             plugin.setBaseFolder((String) dbObject.get("baseFolder"));
             plugin.setConfigFolder((String) dbObject.get("configFolder"));

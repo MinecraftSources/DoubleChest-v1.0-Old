@@ -48,7 +48,6 @@ public class BungeeTypeLoader extends EntityLoader<MN2BungeeType> {
         if (dbObject != null) {
             MN2BungeeType bungeeType = new MN2BungeeType();
             bungeeType.set_id(_id);
-            bungeeType.setDbObject(dbObject);
             bungeeType.setName((String) dbObject.get("name"));
 
             BasicDBList plugins = (BasicDBList) dbObject.get("plugins");
@@ -74,7 +73,7 @@ public class BungeeTypeLoader extends EntityLoader<MN2BungeeType> {
                         return null;
                     }
                 }
-                bungeeType.getPlugins().add(new AbstractMap.SimpleEntry<MN2Plugin, MN2Plugin.PluginConfig>(plugin, pluginConfig));
+                bungeeType.getPlugins().put(plugin, pluginConfig);
             }
 
             BasicDBList servertypes = (BasicDBList) dbObject.get("servertypes");
@@ -106,16 +105,77 @@ public class BungeeTypeLoader extends EntityLoader<MN2BungeeType> {
 
     @Override
     public void saveEntity(MN2BungeeType entity) {
+        BasicDBObject values = new BasicDBObject();
 
+        values.put("name", entity.getName());
+
+        BasicDBList serverTypes = new BasicDBList();
+        for (MN2ServerType serverType : entity.getServerTypes()) {
+            BasicDBObject object = new BasicDBObject();
+            object.put("_id", serverType.get_id());
+            if (serverType == entity.getDefaultType()) {
+                object.put("isDefault", true);
+            } else {
+                object.put("isDefault", false);
+            }
+            serverTypes.add(object);
+        }
+        values.put("servertypes", serverTypes);
+
+        BasicDBList plugins = new BasicDBList();
+        for (MN2Plugin plugin : entity.getPlugins().keySet()) {
+            BasicDBObject object = new BasicDBObject();
+            object.put("_id", plugin.get_id());
+            MN2Plugin.PluginConfig pluginConfig = entity.getPlugins().get(plugin);
+            if (pluginConfig != null) {
+                object.put("_configId", pluginConfig.get_id());
+            }
+            plugins.add(object);
+        }
+        values.put("plugins", plugins);
+
+        BasicDBObject set = new BasicDBObject("$set", values);
+        getDb().updateDocument(getCollection(), new BasicDBObject("_id", entity.get_id()), set);
+        log.info("Saving Bungee Type "+entity.getName());
     }
 
     @Override
     public ObjectId insertEntity(MN2BungeeType entity) {
-        return null;
+        BasicDBObject dbObject = new BasicDBObject("_id", new ObjectId());
+
+        dbObject.put("name", entity.getName());
+
+        BasicDBList serverTypes = new BasicDBList();
+        for (MN2ServerType serverType : entity.getServerTypes()) {
+            BasicDBObject object = new BasicDBObject();
+            object.put("_id", serverType.get_id());
+            if (serverType == entity.getDefaultType()) {
+                object.put("isDefault", true);
+            } else {
+                object.put("isDefault", false);
+            }
+            serverTypes.add(object);
+        }
+        dbObject.put("servertypes", serverTypes);
+
+        BasicDBList plugins = new BasicDBList();
+        for (MN2Plugin plugin : entity.getPlugins().keySet()) {
+            BasicDBObject object = new BasicDBObject();
+            object.put("_id", plugin.get_id());
+            MN2Plugin.PluginConfig pluginConfig = entity.getPlugins().get(plugin);
+            if (pluginConfig != null) {
+                object.put("_configId", pluginConfig.get_id());
+            }
+            plugins.add(object);
+        }
+        dbObject.put("plugins", plugins);
+
+        getDb().insert(getCollection(), dbObject);
+        return (ObjectId) dbObject.get("_id");
     }
 
     @Override
     public void removeEntity(MN2BungeeType entity) {
-
+        getDb().remove(getCollection(), new BasicDBObject("_id", entity.get_id()));
     }
 }

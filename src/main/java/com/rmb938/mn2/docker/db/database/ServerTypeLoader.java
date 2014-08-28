@@ -55,7 +55,6 @@ public class ServerTypeLoader extends EntityLoader<MN2ServerType> {
         if (dbObject != null) {
             MN2ServerType serverType = new MN2ServerType();
             serverType.set_id(_id);
-            serverType.setDbObject(dbObject);
             serverType.setName((String)dbObject.get("name"));
             serverType.setAmount((Integer)dbObject.get("amount"));
             serverType.setMemory((Integer)dbObject.get("memory"));
@@ -86,7 +85,7 @@ public class ServerTypeLoader extends EntityLoader<MN2ServerType> {
                         return null;
                     }
                 }
-                serverType.getPlugins().add(new AbstractMap.SimpleEntry<MN2Plugin, MN2Plugin.PluginConfig>(plugin, pluginConfig));
+                serverType.getPlugins().put(plugin, pluginConfig);
             }
 
             //log.info("Loading "+serverType.getName()+" worlds");

@@ -11,7 +11,4 @@ public abstract class MN2Entity {
     @Setter
     private ObjectId _id;
 
-    @Setter
-    private DBObject dbObject;
-
 }

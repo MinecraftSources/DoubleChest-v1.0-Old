@@ -37,7 +37,7 @@ public class NodeLoader extends EntityLoader<MN2Node> {
     public ArrayList<MN2Node> getNodes() {
         ArrayList<MN2Node> nodes = new ArrayList<>();
         DBCursor dbCursor = getDb().findMany(getCollection());
-        if (dbCursor.hasNext()) {
+        while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
             MN2Node node = loadEntity((ObjectId)dbObject.get("_id"));
             if (node != null) {
@@ -51,7 +51,7 @@ public class NodeLoader extends EntityLoader<MN2Node> {
     public ArrayList<MN2Node> getOnlineNodes() {
         ArrayList<MN2Node> nodes = new ArrayList<>();
         DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis()-30000)));
-        if (dbCursor.hasNext()) {
+        while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
             MN2Node node = loadEntity((ObjectId)dbObject.get("_id"));
             if (node != null) {
@@ -72,7 +72,6 @@ public class NodeLoader extends EntityLoader<MN2Node> {
         if (dbObject != null) {
             MN2Node node = new MN2Node();
             node.set_id(_id);
-            node.setDbObject(dbObject);
             node.setAddress((String) dbObject.get("host"));
             node.setRam((Integer) dbObject.get("ram"));
             Object lastUpdate = dbObject.get("lastUpdate");
