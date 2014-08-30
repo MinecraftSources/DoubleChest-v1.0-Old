@@ -55,11 +55,10 @@ public class ServerTypeLoader extends EntityLoader<MN2ServerType> {
         if (dbObject != null) {
             MN2ServerType serverType = new MN2ServerType();
             serverType.set_id(_id);
-            serverType.setName((String)dbObject.get("name"));
-            serverType.setAmount((Integer)dbObject.get("amount"));
-            serverType.setMemory((Integer)dbObject.get("memory"));
-            serverType.setPlayers((Integer)dbObject.get("players"));
-            serverType.setAllowRejoin((Boolean)dbObject.get("allowRejoin"));
+            serverType.setName((String) dbObject.get("name"));
+            serverType.setAmount((Integer) dbObject.get("amount"));
+            serverType.setMemory((Integer) dbObject.get("memory"));
+            serverType.setPlayers((Integer) dbObject.get("players"));
 
             //log.info("Loading "+serverType.getName()+" plugins");
             BasicDBList plugins = (BasicDBList) dbObject.get("plugins");
@@ -115,22 +114,89 @@ public class ServerTypeLoader extends EntityLoader<MN2ServerType> {
             //log.info("Loaded Type "+serverType.getName());
             return serverType;
         }
-        log.info("Unknown Server Type "+_id.toString());
+        log.error("Unknown Server Type "+_id.toString());
         return null;
     }
 
     @Override
     public void saveEntity(MN2ServerType serverType) {
+        BasicDBObject values = new BasicDBObject();
 
+        values.put("name", serverType.getName());
+        values.put("players", serverType.getPlayers());
+        values.put("memory", serverType.getMemory());
+        values.put("amount", serverType.getAmount());
+
+        BasicDBList plugins = new BasicDBList();
+        for (MN2Plugin plugin : serverType.getPlugins().keySet()) {
+            BasicDBObject object = new BasicDBObject();
+            object.put("_id", plugin.get_id());
+            MN2Plugin.PluginConfig pluginConfig = serverType.getPlugins().get(plugin);
+            if (pluginConfig != null) {
+                object.put("_configId", pluginConfig.get_id());
+            }
+            plugins.add(object);
+        }
+        values.put("plugins", plugins);
+
+        BasicDBList worlds = new BasicDBList();
+        for (MN2World world : serverType.getWorlds()) {
+            BasicDBObject object = new BasicDBObject();
+            object.put("_id", world.get_id());
+            if (serverType.getDefaultWorld() == world) {
+                object.put("isDefault", true);
+            } else {
+                object.put("isDefault", false);
+            }
+            worlds.add(object);
+        }
+        values.put("worlds", worlds);
+
+        BasicDBObject set = new BasicDBObject("$set", values);
+        getDb().updateDocument(getCollection(), new BasicDBObject("_id", serverType.get_id()), set);
+        log.info("Saving Server Type "+serverType.getName());
     }
 
     @Override
     public ObjectId insertEntity(MN2ServerType serverType) {
-        return null;
+        BasicDBObject dbObject = new BasicDBObject("_id", new ObjectId());
+
+        dbObject.put("name", serverType.getName());
+        dbObject.put("players", serverType.getPlayers());
+        dbObject.put("memory", serverType.getMemory());
+        dbObject.put("amount", serverType.getAmount());
+
+        BasicDBList plugins = new BasicDBList();
+        for (MN2Plugin plugin : serverType.getPlugins().keySet()) {
+            BasicDBObject object = new BasicDBObject();
+            object.put("_id", plugin.get_id());
+            MN2Plugin.PluginConfig pluginConfig = serverType.getPlugins().get(plugin);
+            if (pluginConfig != null) {
+                object.put("_configId", pluginConfig.get_id());
+            }
+            plugins.add(object);
+        }
+        dbObject.put("plugins", plugins);
+
+        BasicDBList worlds = new BasicDBList();
+        for (MN2World world : serverType.getWorlds()) {
+            BasicDBObject object = new BasicDBObject();
+            object.put("_id", world.get_id());
+            if (serverType.getDefaultWorld() == world) {
+                object.put("isDefault", true);
+            } else {
+                object.put("isDefault", false);
+            }
+            worlds.add(object);
+        }
+        dbObject.put("worlds", worlds);
+
+        getDb().insert(getCollection(), dbObject);
+        return (ObjectId) dbObject.get("_id");
     }
 
     @Override
     public void removeEntity(MN2ServerType entity) {
-
+        getDb().remove(getCollection(), new BasicDBObject("_id", entity.get_id()));
     }
 }

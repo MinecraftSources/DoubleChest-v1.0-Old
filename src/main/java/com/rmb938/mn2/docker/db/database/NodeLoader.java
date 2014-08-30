@@ -95,16 +95,38 @@ public class NodeLoader extends EntityLoader<MN2Node> {
 
     @Override
     public void saveEntity(MN2Node node) {
+        BasicDBObject values = new BasicDBObject();
 
+        values.put("ram", node.getRam());
+        if (node.getBungeeType() != null) {
+            values.put("_bungeeType", node.getBungeeType().get_id());
+        } else {
+            values.put("_bungeeType", null);
+        }
+
+        BasicDBObject set = new BasicDBObject("$set", values);
+        getDb().updateDocument(getCollection(), new BasicDBObject("_id", node.get_id()), set);
+        log.info("Saving Node " + node.getAddress());
     }
 
     @Override
     public ObjectId insertEntity(MN2Node node) {
-        return null;
+        BasicDBObject dbObject = new BasicDBObject("_id", new ObjectId());
+
+        dbObject.put("host", node.getAddress());
+        dbObject.put("ram", node.getRam());
+        dbObject.put("lastUpdate", node.getLastUpdate());
+        if (node.getBungeeType() != null) {
+            dbObject.put("_bungeeType", node.getBungeeType().get_id());
+        } else {
+            dbObject.put("_bungeeType", null);
+        }
+        getDb().insert(getCollection(), dbObject);
+        return (ObjectId)dbObject.get("_id");
     }
 
     @Override
     public void removeEntity(MN2Node entity) {
-
+        getDb().delete(getCollection(), new BasicDBObject("_id", entity.get_id()));
     }
 }

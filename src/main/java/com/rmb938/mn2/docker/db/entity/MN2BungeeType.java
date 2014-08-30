@@ -22,6 +22,6 @@ public class MN2BungeeType extends MN2Entity {
     private HashMap<MN2Plugin, MN2Plugin.PluginConfig> plugins = new HashMap<>();
 
     @Getter
-    private ArrayList<MN2ServerType> serverTypes = new ArrayList<>();
+    private HashMap<MN2ServerType, Boolean> serverTypes = new HashMap<>();
 
 }

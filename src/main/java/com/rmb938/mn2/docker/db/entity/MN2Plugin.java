@@ -38,7 +38,7 @@ public class MN2Plugin extends MN2Entity {
 
     }
 
-    public class PluginConfig extends MN2Entity {
+    public static class PluginConfig extends MN2Entity {
 
         @Getter
         @Setter

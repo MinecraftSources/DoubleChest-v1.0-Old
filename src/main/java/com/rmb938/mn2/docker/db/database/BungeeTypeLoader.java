@@ -85,7 +85,7 @@ public class BungeeTypeLoader extends EntityLoader<MN2BungeeType> {
                     log.error("Error loading server type for bungee "+bungeeType.getName());
                     return null;
                 }
-                bungeeType.getServerTypes().add(serverType);
+                bungeeType.getServerTypes().put(serverType, (Boolean) dbObj.get("allowRejoin"));
 
                 boolean defaultType = (Boolean) dbObj.get("isDefault");
                 if (defaultType) {
@@ -99,7 +99,7 @@ public class BungeeTypeLoader extends EntityLoader<MN2BungeeType> {
             }
             return bungeeType;
         }
-        log.info("Unknown Bungee Type "+_id.toString());
+        log.error("Unknown Bungee Type "+_id.toString());
         return null;
     }
 
@@ -110,9 +110,11 @@ public class BungeeTypeLoader extends EntityLoader<MN2BungeeType> {
         values.put("name", entity.getName());
 
         BasicDBList serverTypes = new BasicDBList();
-        for (MN2ServerType serverType : entity.getServerTypes()) {
+        for (MN2ServerType serverType : entity.getServerTypes().keySet()) {
+            boolean allowRejoin = entity.getServerTypes().get(serverType);
             BasicDBObject object = new BasicDBObject();
             object.put("_id", serverType.get_id());
+            object.put("allowRejoin", allowRejoin);
             if (serverType == entity.getDefaultType()) {
                 object.put("isDefault", true);
             } else {
@@ -146,9 +148,11 @@ public class BungeeTypeLoader extends EntityLoader<MN2BungeeType> {
         dbObject.put("name", entity.getName());
 
         BasicDBList serverTypes = new BasicDBList();
-        for (MN2ServerType serverType : entity.getServerTypes()) {
+        for (MN2ServerType serverType : entity.getServerTypes().keySet()) {
+            boolean allowRejoin = entity.getServerTypes().get(serverType);
             BasicDBObject object = new BasicDBObject();
             object.put("_id", serverType.get_id());
+            object.put("allowRejoin", allowRejoin);
             if (serverType == entity.getDefaultType()) {
                 object.put("isDefault", true);
             } else {

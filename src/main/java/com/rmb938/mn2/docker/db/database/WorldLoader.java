@@ -1,17 +1,35 @@
 package com.rmb938.mn2.docker.db.database;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.rmb938.mn2.docker.db.entity.MN2World;
 import com.rmb938.mn2.docker.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
 
+import java.util.ArrayList;
+
 @Log4j2
 public class WorldLoader extends EntityLoader<MN2World> {
 
     public WorldLoader(MongoDatabase db) {
         super(db, "worlds");
+    }
+
+    public ArrayList<MN2World> getWorlds() {
+        ArrayList<MN2World> worlds = new ArrayList<>();
+        DBCursor dbCursor = getDb().findMany(getCollection());
+        while (dbCursor.hasNext()) {
+            DBObject dbObject = dbCursor.next();
+            MN2World world = loadEntity((ObjectId) dbObject.get("_id"));
+            if (world != null) {
+                worlds.add(world);
+            }
+        }
+
+        dbCursor.close();
+        return worlds;
     }
 
     @Override
@@ -43,16 +61,33 @@ public class WorldLoader extends EntityLoader<MN2World> {
 
     @Override
     public void saveEntity(MN2World world) {
+        BasicDBObject values = new BasicDBObject();
 
+        values.put("name", world.getName());
+        values.put("folder", world.getFolder());
+        values.put("environment", world.getEnvironment().name());
+        values.put("generator", world.getGenerator());
+
+        BasicDBObject set = new BasicDBObject("$set", values);
+        getDb().updateDocument(getCollection(), new BasicDBObject("_id", world.get_id()), set);
+        log.info("Saving World "+world.getName());
     }
 
     @Override
     public ObjectId insertEntity(MN2World world) {
-        return null;
+        BasicDBObject dbObject = new BasicDBObject("_id", new ObjectId());
+
+        dbObject.put("name", world.getName());
+        dbObject.put("folder", world.getFolder());
+        dbObject.put("environment", world.getEnvironment().name());
+        dbObject.put("generator", world.getGenerator());
+
+        getDb().insert(getCollection(), dbObject);
+        return (ObjectId) dbObject.get("_id");
     }
 
     @Override
     public void removeEntity(MN2World entity) {
-
+        getDb().remove(getCollection(), new BasicDBObject("_id", entity.get_id()));
     }
 }

@@ -70,29 +70,68 @@ public class PluginLoader extends EntityLoader<MN2Plugin> {
             for (Object obj : configs) {
                 DBObject dbObj = (DBObject) obj;
                 MN2Plugin.PluginConfig pluginConfig = plugin.newPluginConfig();
+                pluginConfig.set_id((ObjectId) dbObj.get("_id"));
                 pluginConfig.setName((String) dbObj.get("name"));
                 pluginConfig.setLocation((String) dbObj.get("location"));
 
-                plugin.getConfigs().put((ObjectId)dbObj.get("_id"), pluginConfig);
+                plugin.getConfigs().put(pluginConfig.get_id(), pluginConfig);
             }
             return plugin;
         }
-        //log.info("Unknown Plugin "+_id.toString());
+        log.error("Unknown Plugin " + _id.toString());
         return null;
     }
 
     @Override
     public void saveEntity(MN2Plugin plugin) {
+        BasicDBObject values = new BasicDBObject();
 
+        values.put("name", plugin.getName());
+        values.put("type", plugin.getType().name());
+        values.put("baseFolder", plugin.getBaseFolder());
+        values.put("configFolder", plugin.getConfigFolder());
+
+        BasicDBList configs = new BasicDBList();
+        for (MN2Plugin.PluginConfig config : plugin.getConfigs().values()) {
+            BasicDBObject object = new BasicDBObject();
+            object.put("_id", config.get_id());
+            object.put("name", config.getName());
+            object.put("location", config.getLocation());
+            configs.add(object);
+        }
+        values.put("configs", configs);
+
+        BasicDBObject set = new BasicDBObject("$set", values);
+        getDb().updateDocument(getCollection(), new BasicDBObject("_id", plugin.get_id()), set);
+        log.info("Saving Plugin " + plugin.getName());
     }
 
     @Override
     public ObjectId insertEntity(MN2Plugin plugin) {
-        return null;
+        BasicDBObject dbObject = new BasicDBObject("_id", new ObjectId());
+
+        dbObject.put("name", plugin.getName());
+        dbObject.put("type", plugin.getType().name());
+        dbObject.put("baseFolder", plugin.getBaseFolder());
+        dbObject.put("configFolder", plugin.getConfigFolder());
+
+        BasicDBList configs = new BasicDBList();
+        for (MN2Plugin.PluginConfig config : plugin.getConfigs().values()) {
+            BasicDBObject object = new BasicDBObject();
+            object.put("_id", config.get_id());
+            object.put("name", config.getName());
+            object.put("location", config.getLocation());
+            configs.add(object);
+        }
+        dbObject.put("configs", configs);
+
+        getDb().insert(getCollection(), dbObject);
+
+        return (ObjectId)dbObject.get("_id");
     }
 
     @Override
     public void removeEntity(MN2Plugin entity) {
-
+        getDb().delete(getCollection(), new BasicDBObject("_id", entity.get_id()));
     }
 }
