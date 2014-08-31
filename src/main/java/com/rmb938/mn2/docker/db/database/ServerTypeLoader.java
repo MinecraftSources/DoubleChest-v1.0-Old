@@ -69,6 +69,7 @@ public class ServerTypeLoader extends EntityLoader<MN2ServerType> {
             serverType.setAmount((Integer) dbObject.get("amount"));
             serverType.setMemory((Integer) dbObject.get("memory"));
             serverType.setPlayers((Integer) dbObject.get("players"));
+            serverType.setDisabled((Boolean) dbObject.get("disabled"));
 
             //log.info("Loading "+serverType.getName()+" plugins");
             BasicDBList plugins = (BasicDBList) dbObject.get("plugins");
@@ -136,6 +137,7 @@ public class ServerTypeLoader extends EntityLoader<MN2ServerType> {
         values.put("players", serverType.getPlayers());
         values.put("memory", serverType.getMemory());
         values.put("amount", serverType.getAmount());
+        values.put("disabled", serverType.isDisabled());
 
         BasicDBList plugins = new BasicDBList();
         for (MN2Plugin plugin : serverType.getPlugins().keySet()) {
@@ -175,6 +177,7 @@ public class ServerTypeLoader extends EntityLoader<MN2ServerType> {
         dbObject.put("players", serverType.getPlayers());
         dbObject.put("memory", serverType.getMemory());
         dbObject.put("amount", serverType.getAmount());
+        dbObject.put("disabled", serverType.isDisabled());
 
         BasicDBList plugins = new BasicDBList();
         for (MN2Plugin plugin : serverType.getPlugins().keySet()) {
