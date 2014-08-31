@@ -45,6 +45,17 @@ public class ServerTypeLoader extends EntityLoader<MN2ServerType> {
         return types;
     }
 
+    public MN2ServerType getType(String typeName) {
+        if (typeName == null) {
+            return null;
+        }
+        DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("name", typeName));
+        if (dbObject != null) {
+            return loadEntity((ObjectId) dbObject.get("_id"));
+        }
+        return null;
+    }
+
     @Override
     public MN2ServerType loadEntity(ObjectId _id) {
         if (_id == null) {

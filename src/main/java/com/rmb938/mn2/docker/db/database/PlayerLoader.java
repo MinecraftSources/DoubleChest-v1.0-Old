@@ -40,6 +40,7 @@ public class PlayerLoader extends EntityLoader<MN2Player> {
             log.error("Error loading player. uuid null");
             return null;
         }
+        log.info("FInding Player "+uuid.toString());
         DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("uuid", uuid.toString()));
         if (dbObject != null) {
             return loadEntity((ObjectId) dbObject.get("_id"));
@@ -102,6 +103,8 @@ public class PlayerLoader extends EntityLoader<MN2Player> {
         dbObject.put("uuid", entity.getUuid().toString());
         dbObject.put("name", entity.getPlayerName());
         dbObject.put("lastServerTypes", new BasicDBList());
+
+        getDb().insert(getCollection(), dbObject);
 
         return (ObjectId)dbObject.get("_id");
     }

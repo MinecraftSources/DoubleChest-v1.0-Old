@@ -17,13 +17,15 @@ import java.util.ArrayList;
 @Log4j2
 public class ServerLoader extends EntityLoader<MN2Server> {
 
+    private final PlayerLoader playerLoader;
     private final NodeLoader nodeLoader;
     private final ServerTypeLoader serverTypeLoader;
 
-    public ServerLoader(MongoDatabase db, NodeLoader nodeLoader, ServerTypeLoader serverTypeLoader) {
+    public ServerLoader(MongoDatabase db, NodeLoader nodeLoader, ServerTypeLoader serverTypeLoader, PlayerLoader playerLoader) {
         super(db, "servers");
         this.nodeLoader = nodeLoader;
         this.serverTypeLoader = serverTypeLoader;
+        this.playerLoader = playerLoader;
 
         //servertype index
         BasicDBObject index = new BasicDBObject();
@@ -53,7 +55,22 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         return getDb().count(getCollection(), new BasicDBObject("_servertype", serverType.get_id()));
     }
 
-    public int getNextNumber(MN2ServerType serverType) {
+    public MN2Server getServer(MN2ServerType serverType, int number) {
+        if (serverType == null) {
+            return null;
+        }
+        BasicDBList and = new BasicDBList();
+        and.add(new BasicDBObject("_servertype", serverType.get_id()));
+        and.add(new BasicDBObject("number", number));
+
+        DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("$and", and));
+        if (dbObject != null) {
+            return loadEntity((ObjectId) dbObject.get("_id"));
+        }
+        return null;
+    }
+
+    private int getNextNumber(MN2ServerType serverType) {
         int number = 1;
         BasicDBList and = new BasicDBList();
         and.add(new BasicDBObject("_servertype", serverType.get_id()));
@@ -142,7 +159,10 @@ public class ServerLoader extends EntityLoader<MN2Server> {
             for (Object object : players) {
                 DBObject dbObj = (DBObject) object;
                 ObjectId _playerId = (ObjectId) dbObj.get("_id");
-                //load player entity and add
+                MN2Player player = playerLoader.loadEntity(_playerId);
+                if (player != null) {
+                    server.getPlayers().add(player);
+                }
             }
 
             return server;
