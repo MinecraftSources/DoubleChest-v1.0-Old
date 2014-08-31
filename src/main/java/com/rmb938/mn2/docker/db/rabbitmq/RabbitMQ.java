@@ -1,6 +1,8 @@
 package com.rmb938.mn2.docker.db.rabbitmq;
 
-import com.rabbitmq.client.*;
+import com.rabbitmq.client.Address;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;

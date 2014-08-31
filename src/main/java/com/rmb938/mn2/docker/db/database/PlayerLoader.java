@@ -3,7 +3,6 @@ package com.rmb938.mn2.docker.db.database;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import com.rmb938.mn2.docker.db.entity.MN2Bungee;
 import com.rmb938.mn2.docker.db.entity.MN2BungeeType;
 import com.rmb938.mn2.docker.db.entity.MN2Player;
 import com.rmb938.mn2.docker.db.entity.MN2ServerType;
