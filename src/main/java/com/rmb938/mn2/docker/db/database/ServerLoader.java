@@ -74,14 +74,15 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         int number = 1;
         BasicDBList and = new BasicDBList();
         and.add(new BasicDBObject("_servertype", serverType.get_id()));
-        and.add(new BasicDBObject("number", number));
         while (true) {
-            and.remove(1);
             and.add(new BasicDBObject("number", number));
             DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("$and", and));
             if (dbObject == null) {
+                log.info("Found number "+number);
                 break;
             }
+            log.info("Already has number "+number);
+            and.remove(1);
             number += 1;
         }
         return number;
