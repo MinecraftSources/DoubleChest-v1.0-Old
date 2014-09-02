@@ -5,15 +5,15 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 
-public class UServer extends UEntity {
+public class DCServer extends DCEntity {
 
     @Getter
     @Setter
-    private UServerType serverType;
+    private DCServerType serverType;
 
     @Getter
     @Setter
-    private UNode node;
+    private DCNode node;
 
     @Getter
     @Setter
@@ -32,6 +32,6 @@ public class UServer extends UEntity {
     private int port;
 
     @Getter
-    private ArrayList<UPlayer> players = new ArrayList<>();
+    private ArrayList<DCPlayer> players = new ArrayList<>();
 
 }

@@ -6,10 +6,10 @@ import lombok.Setter;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class UPlayer extends UEntity {
+public class DCPlayer extends DCEntity {
 
     @Getter
-    private HashMap<UBungeeType, UServerType> lastServerTypes = new HashMap<>();
+    private HashMap<DCBungeeType, DCServerType> lastServerTypes = new HashMap<>();
 
     @Getter
     @Setter

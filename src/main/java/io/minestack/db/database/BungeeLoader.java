@@ -3,8 +3,8 @@ package io.minestack.db.database;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import io.minestack.db.entity.UBungee;
-import io.minestack.db.entity.UNode;
+import io.minestack.db.entity.DCBungee;
+import io.minestack.db.entity.DCNode;
 import io.minestack.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
@@ -12,7 +12,7 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 
 @Log4j2
-public class BungeeLoader extends EntityLoader<UBungee> {
+public class BungeeLoader extends EntityLoader<DCBungee> {
 
     private final BungeeTypeLoader bungeeTypeLoader;
     private final NodeLoader nodeLoader;
@@ -23,7 +23,7 @@ public class BungeeLoader extends EntityLoader<UBungee> {
         this.nodeLoader = nodeLoader;
     }
 
-    public UBungee getNodeBungee(UNode node) {
+    public DCBungee getNodeBungee(DCNode node) {
         DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("_node", node.get_id()));
         if (dbObject != null) {
             return loadEntity((ObjectId) dbObject.get("_id"));
@@ -31,13 +31,13 @@ public class BungeeLoader extends EntityLoader<UBungee> {
         return null;
     }
 
-    public ArrayList<UBungee> getBungees() {
-        ArrayList<UBungee> bungees = new ArrayList<>();
+    public ArrayList<DCBungee> getBungees() {
+        ArrayList<DCBungee> bungees = new ArrayList<>();
 
         DBCursor dbCursor = getDb().findMany(getCollection());
         while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
-            UBungee bungee = loadEntity((ObjectId) dbObject.get("_id"));
+            DCBungee bungee = loadEntity((ObjectId) dbObject.get("_id"));
             if (bungee != null) {
                 bungees.add(bungee);
             }
@@ -47,14 +47,14 @@ public class BungeeLoader extends EntityLoader<UBungee> {
     }
 
     @Override
-    public UBungee loadEntity(ObjectId _id) {
+    public DCBungee loadEntity(ObjectId _id) {
         if (_id == null) {
             log.error("Error loading bungee. _id null");
             return null;
         }
         DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("_id", _id));
         if (dbObject != null) {
-            UBungee bungee = new UBungee();
+            DCBungee bungee = new DCBungee();
             bungee.set_id((ObjectId) dbObject.get("_id"));
             bungee.setBungeeType(bungeeTypeLoader.loadEntity((ObjectId) dbObject.get("_bungeetype")));
             bungee.setNode(nodeLoader.loadEntity((ObjectId) dbObject.get("_node")));
@@ -67,7 +67,7 @@ public class BungeeLoader extends EntityLoader<UBungee> {
     }
 
     @Override
-    public void saveEntity(UBungee entity) {
+    public void saveEntity(DCBungee entity) {
         BasicDBObject values = new BasicDBObject();
         values.put("lastUpdate", entity.getLastUpdate());
         values.put("containerId", entity.getContainerId());
@@ -78,7 +78,7 @@ public class BungeeLoader extends EntityLoader<UBungee> {
     }
 
     @Override
-    public ObjectId insertEntity(UBungee entity) {
+    public ObjectId insertEntity(DCBungee entity) {
         BasicDBObject dbObject = new BasicDBObject("_id", new ObjectId());
         dbObject.append("_bungeetype", entity.getBungeeType().get_id());
         dbObject.append("_node", entity.getNode().get_id());
@@ -89,7 +89,7 @@ public class BungeeLoader extends EntityLoader<UBungee> {
     }
 
     @Override
-    public void removeEntity(UBungee entity) {
+    public void removeEntity(DCBungee entity) {
         getDb().delete(getCollection(), new BasicDBObject("_id", entity.get_id()));
     }
 }

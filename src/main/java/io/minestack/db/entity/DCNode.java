@@ -3,7 +3,7 @@ package io.minestack.db.entity;
 import lombok.Getter;
 import lombok.Setter;
 
-public class UNode extends UEntity {
+public class DCNode extends DCEntity {
 
     @Getter
     @Setter
@@ -19,5 +19,5 @@ public class UNode extends UEntity {
 
     @Getter
     @Setter
-    private UBungeeType bungeeType;
+    private DCBungeeType bungeeType;
 }

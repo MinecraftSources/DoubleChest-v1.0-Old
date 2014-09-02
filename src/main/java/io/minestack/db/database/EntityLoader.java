@@ -1,11 +1,11 @@
 package io.minestack.db.database;
 
-import io.minestack.db.entity.UEntity;
+import io.minestack.db.entity.DCEntity;
 import io.minestack.db.mongo.MongoDatabase;
 import lombok.Getter;
 import org.bson.types.ObjectId;
 
-public abstract class EntityLoader<T extends UEntity> {
+public abstract class EntityLoader<T extends DCEntity> {
 
     @Getter
     private final MongoDatabase db;

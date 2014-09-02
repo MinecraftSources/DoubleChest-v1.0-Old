@@ -3,15 +3,15 @@ package io.minestack.db.entity;
 import lombok.Getter;
 import lombok.Setter;
 
-public class UBungee extends UEntity {
+public class DCBungee extends DCEntity {
 
     @Getter
     @Setter
-    private UBungeeType bungeeType;
+    private DCBungeeType bungeeType;
 
     @Getter
     @Setter
-    private UNode node;
+    private DCNode node;
 
     @Getter
     @Setter

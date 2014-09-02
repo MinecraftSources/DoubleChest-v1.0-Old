@@ -4,9 +4,9 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import io.minestack.db.entity.UBungeeType;
-import io.minestack.db.entity.UPlugin;
-import io.minestack.db.entity.UServerType;
+import io.minestack.db.entity.DCBungeeType;
+import io.minestack.db.entity.DCServerType;
+import io.minestack.db.entity.DCPlugin;
 import io.minestack.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
@@ -14,7 +14,7 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 
 @Log4j2
-public class BungeeTypeLoader extends EntityLoader<UBungeeType> {
+public class BungeeTypeLoader extends EntityLoader<DCBungeeType> {
 
     private final PluginLoader pluginLoader;
     private final ServerTypeLoader serverTypeLoader;
@@ -25,12 +25,12 @@ public class BungeeTypeLoader extends EntityLoader<UBungeeType> {
         this.serverTypeLoader = serverTypeLoader;
     }
 
-    public ArrayList<UBungeeType> getTypes() {
-        ArrayList<UBungeeType> types = new ArrayList<>();
+    public ArrayList<DCBungeeType> getTypes() {
+        ArrayList<DCBungeeType> types = new ArrayList<>();
         DBCursor dbCursor = getDb().findMany(getCollection());
         while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
-            UBungeeType type = loadEntity((ObjectId)dbObject.get("_id"));
+            DCBungeeType type = loadEntity((ObjectId)dbObject.get("_id"));
             if (type != null) {
                 types.add(type);
             }
@@ -40,14 +40,14 @@ public class BungeeTypeLoader extends EntityLoader<UBungeeType> {
     }
 
     @Override
-    public UBungeeType loadEntity(ObjectId _id) {
+    public DCBungeeType loadEntity(ObjectId _id) {
         if (_id == null) {
             log.error("Error loading bungee. _id null");
             return null;
         }
         DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("_id", _id));
         if (dbObject != null) {
-            UBungeeType bungeeType = new UBungeeType();
+            DCBungeeType bungeeType = new DCBungeeType();
             bungeeType.set_id(_id);
             bungeeType.setName((String) dbObject.get("name"));
 
@@ -55,17 +55,17 @@ public class BungeeTypeLoader extends EntityLoader<UBungeeType> {
             for (Object obj : plugins) {
                 DBObject dbObj = (DBObject) obj;
                 ObjectId _pluginId = (ObjectId) dbObj.get("_id");
-                UPlugin plugin = pluginLoader.loadEntity(_pluginId);
+                DCPlugin plugin = pluginLoader.loadEntity(_pluginId);
                 if (plugin == null) {
                     log.error("Error loading plugin for bungee "+bungeeType.getName());
                     return null;
                 }
 
-                if (plugin.getType() != UPlugin.PluginType.BUNGEE) {
+                if (plugin.getType() != DCPlugin.PluginType.BUNGEE) {
                     log.error("Trying to add Non-Bungee plugin "+plugin.getName()+" to bungee "+bungeeType.getName());
                     return null;
                 }
-                UPlugin.PluginConfig pluginConfig = null;
+                DCPlugin.PluginConfig pluginConfig = null;
                 if (dbObj.containsField("_configId")) {
                     ObjectId _configId = (ObjectId) dbObj.get("_configId");
                     pluginConfig = plugin.getConfigs().get(_configId);
@@ -81,7 +81,7 @@ public class BungeeTypeLoader extends EntityLoader<UBungeeType> {
             for (Object obj : servertypes) {
                 DBObject dbObj = (DBObject) obj;
                 ObjectId _servertype = (ObjectId) dbObj.get("_id");
-                UServerType serverType = serverTypeLoader.loadEntity(_servertype);
+                DCServerType serverType = serverTypeLoader.loadEntity(_servertype);
                 if (serverType == null) {
                     log.error("Error loading server type for bungee "+bungeeType.getName());
                     return null;
@@ -105,13 +105,13 @@ public class BungeeTypeLoader extends EntityLoader<UBungeeType> {
     }
 
     @Override
-    public void saveEntity(UBungeeType entity) {
+    public void saveEntity(DCBungeeType entity) {
         BasicDBObject values = new BasicDBObject();
 
         values.put("name", entity.getName());
 
         BasicDBList serverTypes = new BasicDBList();
-        for (UServerType serverType : entity.getServerTypes().keySet()) {
+        for (DCServerType serverType : entity.getServerTypes().keySet()) {
             boolean allowRejoin = entity.getServerTypes().get(serverType);
             BasicDBObject object = new BasicDBObject();
             object.put("_id", serverType.get_id());
@@ -126,10 +126,10 @@ public class BungeeTypeLoader extends EntityLoader<UBungeeType> {
         values.put("servertypes", serverTypes);
 
         BasicDBList plugins = new BasicDBList();
-        for (UPlugin plugin : entity.getPlugins().keySet()) {
+        for (DCPlugin plugin : entity.getPlugins().keySet()) {
             BasicDBObject object = new BasicDBObject();
             object.put("_id", plugin.get_id());
-            UPlugin.PluginConfig pluginConfig = entity.getPlugins().get(plugin);
+            DCPlugin.PluginConfig pluginConfig = entity.getPlugins().get(plugin);
             if (pluginConfig != null) {
                 object.put("_configId", pluginConfig.get_id());
             }
@@ -143,13 +143,13 @@ public class BungeeTypeLoader extends EntityLoader<UBungeeType> {
     }
 
     @Override
-    public ObjectId insertEntity(UBungeeType entity) {
+    public ObjectId insertEntity(DCBungeeType entity) {
         BasicDBObject dbObject = new BasicDBObject("_id", new ObjectId());
 
         dbObject.put("name", entity.getName());
 
         BasicDBList serverTypes = new BasicDBList();
-        for (UServerType serverType : entity.getServerTypes().keySet()) {
+        for (DCServerType serverType : entity.getServerTypes().keySet()) {
             boolean allowRejoin = entity.getServerTypes().get(serverType);
             BasicDBObject object = new BasicDBObject();
             object.put("_id", serverType.get_id());
@@ -164,10 +164,10 @@ public class BungeeTypeLoader extends EntityLoader<UBungeeType> {
         dbObject.put("servertypes", serverTypes);
 
         BasicDBList plugins = new BasicDBList();
-        for (UPlugin plugin : entity.getPlugins().keySet()) {
+        for (DCPlugin plugin : entity.getPlugins().keySet()) {
             BasicDBObject object = new BasicDBObject();
             object.put("_id", plugin.get_id());
-            UPlugin.PluginConfig pluginConfig = entity.getPlugins().get(plugin);
+            DCPlugin.PluginConfig pluginConfig = entity.getPlugins().get(plugin);
             if (pluginConfig != null) {
                 object.put("_configId", pluginConfig.get_id());
             }
@@ -180,7 +180,7 @@ public class BungeeTypeLoader extends EntityLoader<UBungeeType> {
     }
 
     @Override
-    public void removeEntity(UBungeeType entity) {
+    public void removeEntity(DCBungeeType entity) {
         getDb().remove(getCollection(), new BasicDBObject("_id", entity.get_id()));
     }
 }

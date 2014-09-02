@@ -11,7 +11,7 @@ import lombok.extern.log4j.Log4j2;
 import java.util.List;
 
 @Log4j2
-public class Uranium {
+public class DoubleChest {
 
     @Getter
     private static NodeLoader nodeLoader;
@@ -43,16 +43,16 @@ public class Uranium {
     @Getter
     private static boolean needsInit = true;
 
-    private static Uranium database;
+    private static DoubleChest database;
 
     public static void initDatabase(List<ServerAddress> mongoAddresses, List<Address> rabbitAddresses, String rabbitUsername, String rabbitPassword) throws Exception {
-        if (Uranium.database == null) {
-            Uranium.needsInit = false;
-            database = new Uranium(mongoAddresses, rabbitAddresses, rabbitUsername, rabbitPassword);
+        if (DoubleChest.database == null) {
+            DoubleChest.needsInit = false;
+            database = new DoubleChest(mongoAddresses, rabbitAddresses, rabbitUsername, rabbitPassword);
         }
     }
 
-    private Uranium(List<ServerAddress> mongoAddresses, List<Address> rabbitAddresses, String rabbitUsername, String rabbitPassword) throws Exception {
+    private DoubleChest(List<ServerAddress> mongoAddresses, List<Address> rabbitAddresses, String rabbitUsername, String rabbitPassword) throws Exception {
         if (mongoAddresses.isEmpty()) {
             throw new Exception("No valid mongo addresses");
         }

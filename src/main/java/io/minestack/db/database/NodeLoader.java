@@ -3,8 +3,8 @@ package io.minestack.db.database;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import io.minestack.db.entity.UBungeeType;
-import io.minestack.db.entity.UNode;
+import io.minestack.db.entity.DCBungeeType;
+import io.minestack.db.entity.DCNode;
 import io.minestack.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
@@ -12,7 +12,7 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 
 @Log4j2
-public class NodeLoader extends EntityLoader<UNode> {
+public class NodeLoader extends EntityLoader<DCNode> {
 
     private final BungeeTypeLoader bungeeTypeLoader;
 
@@ -21,12 +21,12 @@ public class NodeLoader extends EntityLoader<UNode> {
         this.bungeeTypeLoader = bungeeTypeLoader;
     }
 
-    public UNode getMaster() {
+    public DCNode getMaster() {
         DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis()-30000)));
         dbCursor = dbCursor.sort(new BasicDBObject("_id", 1));
         if (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
-            UNode node = loadEntity((ObjectId)dbObject.get("_id"));
+            DCNode node = loadEntity((ObjectId)dbObject.get("_id"));
             dbCursor.close();
             return node;
         }
@@ -34,12 +34,12 @@ public class NodeLoader extends EntityLoader<UNode> {
         return null;
     }
 
-    public ArrayList<UNode> getNodes() {
-        ArrayList<UNode> nodes = new ArrayList<>();
+    public ArrayList<DCNode> getNodes() {
+        ArrayList<DCNode> nodes = new ArrayList<>();
         DBCursor dbCursor = getDb().findMany(getCollection());
         while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
-            UNode node = loadEntity((ObjectId)dbObject.get("_id"));
+            DCNode node = loadEntity((ObjectId)dbObject.get("_id"));
             if (node != null) {
                 nodes.add(node);
             }
@@ -48,12 +48,12 @@ public class NodeLoader extends EntityLoader<UNode> {
         return nodes;
     }
 
-    public ArrayList<UNode> getOnlineNodes() {
-        ArrayList<UNode> nodes = new ArrayList<>();
+    public ArrayList<DCNode> getOnlineNodes() {
+        ArrayList<DCNode> nodes = new ArrayList<>();
         DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis()-30000)));
         while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
-            UNode node = loadEntity((ObjectId)dbObject.get("_id"));
+            DCNode node = loadEntity((ObjectId)dbObject.get("_id"));
             if (node != null) {
                 nodes.add(node);
             }
@@ -63,14 +63,14 @@ public class NodeLoader extends EntityLoader<UNode> {
     }
 
     @Override
-    public UNode loadEntity(ObjectId _id) {
+    public DCNode loadEntity(ObjectId _id) {
         if (_id == null) {
             log.error("Error loading node. _id null");
             return null;
         }
         DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("_id", _id));
         if (dbObject != null) {
-            UNode node = new UNode();
+            DCNode node = new DCNode();
             node.set_id(_id);
             node.setAddress((String) dbObject.get("host"));
             node.setRam((Integer) dbObject.get("ram"));
@@ -83,7 +83,7 @@ public class NodeLoader extends EntityLoader<UNode> {
 
             ObjectId _bungeeTypeId = (ObjectId) dbObject.get("_bungeeType");
             if (_bungeeTypeId != null) {
-                UBungeeType bungeeType = bungeeTypeLoader.loadEntity(_bungeeTypeId);
+                DCBungeeType bungeeType = bungeeTypeLoader.loadEntity(_bungeeTypeId);
                 node.setBungeeType(bungeeType);
             }
 
@@ -94,7 +94,7 @@ public class NodeLoader extends EntityLoader<UNode> {
     }
 
     @Override
-    public void saveEntity(UNode node) {
+    public void saveEntity(DCNode node) {
         BasicDBObject values = new BasicDBObject();
 
         values.put("ram", node.getRam());
@@ -110,7 +110,7 @@ public class NodeLoader extends EntityLoader<UNode> {
     }
 
     @Override
-    public ObjectId insertEntity(UNode node) {
+    public ObjectId insertEntity(DCNode node) {
         BasicDBObject dbObject = new BasicDBObject("_id", new ObjectId());
 
         dbObject.put("host", node.getAddress());
@@ -126,7 +126,7 @@ public class NodeLoader extends EntityLoader<UNode> {
     }
 
     @Override
-    public void removeEntity(UNode entity) {
+    public void removeEntity(DCNode entity) {
         getDb().delete(getCollection(), new BasicDBObject("_id", entity.get_id()));
     }
 }

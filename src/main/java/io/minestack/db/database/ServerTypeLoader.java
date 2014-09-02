@@ -4,9 +4,9 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import io.minestack.db.entity.UPlugin;
-import io.minestack.db.entity.UServerType;
-import io.minestack.db.entity.UWorld;
+import io.minestack.db.entity.DCServerType;
+import io.minestack.db.entity.DCWorld;
+import io.minestack.db.entity.DCPlugin;
 import io.minestack.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
@@ -14,7 +14,7 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 
 @Log4j2
-public class ServerTypeLoader extends EntityLoader<UServerType> {
+public class ServerTypeLoader extends EntityLoader<DCServerType> {
 
     private final PluginLoader pluginLoader;
     private final WorldLoader worldLoader;
@@ -30,12 +30,12 @@ public class ServerTypeLoader extends EntityLoader<UServerType> {
         getDb().createIndex(getCollection(), index);
     }
 
-    public ArrayList<UServerType> getTypes() {
-        ArrayList<UServerType> types = new ArrayList<>();
+    public ArrayList<DCServerType> getTypes() {
+        ArrayList<DCServerType> types = new ArrayList<>();
         DBCursor dbCursor = getDb().findMany(getCollection());
         while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
-            UServerType type = loadEntity((ObjectId)dbObject.get("_id"));
+            DCServerType type = loadEntity((ObjectId)dbObject.get("_id"));
             if (type != null) {
                 types.add(type);
             }
@@ -44,7 +44,7 @@ public class ServerTypeLoader extends EntityLoader<UServerType> {
         return types;
     }
 
-    public UServerType getType(String typeName) {
+    public DCServerType getType(String typeName) {
         if (typeName == null) {
             return null;
         }
@@ -56,14 +56,14 @@ public class ServerTypeLoader extends EntityLoader<UServerType> {
     }
 
     @Override
-    public UServerType loadEntity(ObjectId _id) {
+    public DCServerType loadEntity(ObjectId _id) {
         if (_id == null) {
             log.error("Error loading server type. _id null");
             return null;
         }
         DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("_id", _id));
         if (dbObject != null) {
-            UServerType serverType = new UServerType();
+            DCServerType serverType = new DCServerType();
             serverType.set_id(_id);
             serverType.setName((String) dbObject.get("name"));
             serverType.setAmount((Integer) dbObject.get("amount"));
@@ -76,17 +76,17 @@ public class ServerTypeLoader extends EntityLoader<UServerType> {
             for (Object obj : plugins) {
                 DBObject dbObj = (DBObject) obj;
                 ObjectId _pluginId = (ObjectId) dbObj.get("_id");
-                UPlugin plugin = pluginLoader.loadEntity(_pluginId);
+                DCPlugin plugin = pluginLoader.loadEntity(_pluginId);
                 if (plugin == null) {
                     log.error("Error loading plugin for server "+serverType.getName());
                     return null;
                 }
 
-                if (plugin.getType() != UPlugin.PluginType.BUKKIT) {
+                if (plugin.getType() != DCPlugin.PluginType.BUKKIT) {
                     log.error("Trying to add Non-Bukkit plugin "+plugin.getName()+" to server "+serverType.getName());
                     return null;
                 }
-                UPlugin.PluginConfig pluginConfig = null;
+                DCPlugin.PluginConfig pluginConfig = null;
                 if (dbObj.containsField("_configId")) {
                     ObjectId _configId = (ObjectId) dbObj.get("_configId");
                     pluginConfig = plugin.getConfigs().get(_configId);
@@ -104,7 +104,7 @@ public class ServerTypeLoader extends EntityLoader<UServerType> {
                 DBObject dbObj = (DBObject) obj;
                 ObjectId _worldId = (ObjectId) dbObj.get("_id");
                 //log.info("Loading world "+_worldId);
-                UWorld world = worldLoader.loadEntity(_worldId);
+                DCWorld world = worldLoader.loadEntity(_worldId);
                 if (world == null) {
                     log.error("Error loading world for server "+serverType.getName());
                     return null;
@@ -130,7 +130,7 @@ public class ServerTypeLoader extends EntityLoader<UServerType> {
     }
 
     @Override
-    public void saveEntity(UServerType serverType) {
+    public void saveEntity(DCServerType serverType) {
         BasicDBObject values = new BasicDBObject();
 
         values.put("name", serverType.getName());
@@ -140,10 +140,10 @@ public class ServerTypeLoader extends EntityLoader<UServerType> {
         values.put("disabled", serverType.isDisabled());
 
         BasicDBList plugins = new BasicDBList();
-        for (UPlugin plugin : serverType.getPlugins().keySet()) {
+        for (DCPlugin plugin : serverType.getPlugins().keySet()) {
             BasicDBObject object = new BasicDBObject();
             object.put("_id", plugin.get_id());
-            UPlugin.PluginConfig pluginConfig = serverType.getPlugins().get(plugin);
+            DCPlugin.PluginConfig pluginConfig = serverType.getPlugins().get(plugin);
             if (pluginConfig != null) {
                 object.put("_configId", pluginConfig.get_id());
             }
@@ -152,7 +152,7 @@ public class ServerTypeLoader extends EntityLoader<UServerType> {
         values.put("plugins", plugins);
 
         BasicDBList worlds = new BasicDBList();
-        for (UWorld world : serverType.getWorlds()) {
+        for (DCWorld world : serverType.getWorlds()) {
             BasicDBObject object = new BasicDBObject();
             object.put("_id", world.get_id());
             if (serverType.getDefaultWorld() == world) {
@@ -170,7 +170,7 @@ public class ServerTypeLoader extends EntityLoader<UServerType> {
     }
 
     @Override
-    public ObjectId insertEntity(UServerType serverType) {
+    public ObjectId insertEntity(DCServerType serverType) {
         BasicDBObject dbObject = new BasicDBObject("_id", new ObjectId());
 
         dbObject.put("name", serverType.getName());
@@ -180,10 +180,10 @@ public class ServerTypeLoader extends EntityLoader<UServerType> {
         dbObject.put("disabled", serverType.isDisabled());
 
         BasicDBList plugins = new BasicDBList();
-        for (UPlugin plugin : serverType.getPlugins().keySet()) {
+        for (DCPlugin plugin : serverType.getPlugins().keySet()) {
             BasicDBObject object = new BasicDBObject();
             object.put("_id", plugin.get_id());
-            UPlugin.PluginConfig pluginConfig = serverType.getPlugins().get(plugin);
+            DCPlugin.PluginConfig pluginConfig = serverType.getPlugins().get(plugin);
             if (pluginConfig != null) {
                 object.put("_configId", pluginConfig.get_id());
             }
@@ -192,7 +192,7 @@ public class ServerTypeLoader extends EntityLoader<UServerType> {
         dbObject.put("plugins", plugins);
 
         BasicDBList worlds = new BasicDBList();
-        for (UWorld world : serverType.getWorlds()) {
+        for (DCWorld world : serverType.getWorlds()) {
             BasicDBObject object = new BasicDBObject();
             object.put("_id", world.get_id());
             if (serverType.getDefaultWorld() == world) {
@@ -209,7 +209,7 @@ public class ServerTypeLoader extends EntityLoader<UServerType> {
     }
 
     @Override
-    public void removeEntity(UServerType entity) {
+    public void removeEntity(DCServerType entity) {
         getDb().remove(getCollection(), new BasicDBObject("_id", entity.get_id()));
     }
 }

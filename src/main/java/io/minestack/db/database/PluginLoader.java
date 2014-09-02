@@ -4,7 +4,7 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import io.minestack.db.entity.UPlugin;
+import io.minestack.db.entity.DCPlugin;
 import io.minestack.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
@@ -12,18 +12,18 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 
 @Log4j2
-public class PluginLoader extends EntityLoader<UPlugin> {
+public class PluginLoader extends EntityLoader<DCPlugin> {
 
     public PluginLoader(MongoDatabase db) {
         super(db, "plugins");
     }
 
-    public ArrayList<UPlugin> loadPlugins() {
-        ArrayList<UPlugin> plugins = new ArrayList<>();
+    public ArrayList<DCPlugin> loadPlugins() {
+        ArrayList<DCPlugin> plugins = new ArrayList<>();
         DBCursor dbCursor = getDb().findMany(getCollection());
         while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
-            UPlugin plugin = loadEntity((ObjectId) dbObject.get("_id"));
+            DCPlugin plugin = loadEntity((ObjectId) dbObject.get("_id"));
             if (plugin != null) {
                 plugins.add(plugin);
             }
@@ -32,12 +32,12 @@ public class PluginLoader extends EntityLoader<UPlugin> {
         return plugins;
     }
 
-    public ArrayList<UPlugin> loadPlugins(UPlugin.PluginType pluginType) {
-        ArrayList<UPlugin> plugins = new ArrayList<>();
+    public ArrayList<DCPlugin> loadPlugins(DCPlugin.PluginType pluginType) {
+        ArrayList<DCPlugin> plugins = new ArrayList<>();
         DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("type", pluginType.name()));
         while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
-            UPlugin plugin = loadEntity((ObjectId) dbObject.get("_id"));
+            DCPlugin plugin = loadEntity((ObjectId) dbObject.get("_id"));
             if (plugin != null) {
                 plugins.add(plugin);
             }
@@ -47,20 +47,20 @@ public class PluginLoader extends EntityLoader<UPlugin> {
     }
 
     @Override
-    public UPlugin loadEntity(ObjectId _id) {
+    public DCPlugin loadEntity(ObjectId _id) {
         if (_id == null) {
             log.error("Error loading plugin. _id null");
             return null;
         }
         DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("_id", _id));
         if (dbObject != null) {
-            UPlugin plugin = new UPlugin();
+            DCPlugin plugin = new DCPlugin();
             plugin.set_id(_id);
             plugin.setName((String) dbObject.get("name"));
             plugin.setBaseFolder((String) dbObject.get("baseFolder"));
             plugin.setConfigFolder((String) dbObject.get("configFolder"));
             try {
-                plugin.setType(UPlugin.PluginType.valueOf((String) dbObject.get("type")));
+                plugin.setType(DCPlugin.PluginType.valueOf((String) dbObject.get("type")));
             } catch (Exception ex) {
                 log.info("Invalid Plugin Type for plugin "+plugin.getName());
                 return null;
@@ -69,7 +69,7 @@ public class PluginLoader extends EntityLoader<UPlugin> {
             BasicDBList configs = (BasicDBList) dbObject.get("configs");
             for (Object obj : configs) {
                 DBObject dbObj = (DBObject) obj;
-                UPlugin.PluginConfig pluginConfig = plugin.newPluginConfig();
+                DCPlugin.PluginConfig pluginConfig = plugin.newPluginConfig();
                 pluginConfig.set_id((ObjectId) dbObj.get("_id"));
                 pluginConfig.setName((String) dbObj.get("name"));
                 pluginConfig.setLocation((String) dbObj.get("location"));
@@ -83,7 +83,7 @@ public class PluginLoader extends EntityLoader<UPlugin> {
     }
 
     @Override
-    public void saveEntity(UPlugin plugin) {
+    public void saveEntity(DCPlugin plugin) {
         BasicDBObject values = new BasicDBObject();
 
         values.put("name", plugin.getName());
@@ -92,7 +92,7 @@ public class PluginLoader extends EntityLoader<UPlugin> {
         values.put("configFolder", plugin.getConfigFolder());
 
         BasicDBList configs = new BasicDBList();
-        for (UPlugin.PluginConfig config : plugin.getConfigs().values()) {
+        for (DCPlugin.PluginConfig config : plugin.getConfigs().values()) {
             BasicDBObject object = new BasicDBObject();
             object.put("_id", config.get_id());
             object.put("name", config.getName());
@@ -107,7 +107,7 @@ public class PluginLoader extends EntityLoader<UPlugin> {
     }
 
     @Override
-    public ObjectId insertEntity(UPlugin plugin) {
+    public ObjectId insertEntity(DCPlugin plugin) {
         BasicDBObject dbObject = new BasicDBObject("_id", new ObjectId());
 
         dbObject.put("name", plugin.getName());
@@ -116,7 +116,7 @@ public class PluginLoader extends EntityLoader<UPlugin> {
         dbObject.put("configFolder", plugin.getConfigFolder());
 
         BasicDBList configs = new BasicDBList();
-        for (UPlugin.PluginConfig config : plugin.getConfigs().values()) {
+        for (DCPlugin.PluginConfig config : plugin.getConfigs().values()) {
             BasicDBObject object = new BasicDBObject();
             object.put("_id", config.get_id());
             object.put("name", config.getName());
@@ -131,7 +131,7 @@ public class PluginLoader extends EntityLoader<UPlugin> {
     }
 
     @Override
-    public void removeEntity(UPlugin entity) {
+    public void removeEntity(DCPlugin entity) {
         getDb().delete(getCollection(), new BasicDBObject("_id", entity.get_id()));
     }
 }

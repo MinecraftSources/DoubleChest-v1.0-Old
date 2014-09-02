@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 @Log4j2
-public class UServerType extends UEntity {
+public class DCServerType extends DCEntity {
 
     @Getter
     @Setter
@@ -28,21 +28,21 @@ public class UServerType extends UEntity {
 
     @Getter
     @Setter
-    private UWorld defaultWorld;
+    private DCWorld defaultWorld;
 
     @Getter
     @Setter
     private boolean disabled;
 
     @Getter
-    private HashMap<UPlugin, UPlugin.PluginConfig> plugins = new HashMap<>();
+    private HashMap<DCPlugin, DCPlugin.PluginConfig> plugins = new HashMap<>();
 
     @Getter
-    private ArrayList<UWorld> worlds = new ArrayList<>();
+    private ArrayList<DCWorld> worlds = new ArrayList<>();
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof UServerType && get_id().equals(((UServerType) obj).get_id());
+        return obj instanceof DCServerType && get_id().equals(((DCServerType) obj).get_id());
     }
 
     @Override

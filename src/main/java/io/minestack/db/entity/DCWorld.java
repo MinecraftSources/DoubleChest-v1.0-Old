@@ -3,7 +3,7 @@ package io.minestack.db.entity;
 import lombok.Getter;
 import lombok.Setter;
 
-public class UWorld extends UEntity {
+public class DCWorld extends DCEntity {
 
     @Getter
     @Setter

@@ -3,9 +3,9 @@ package io.minestack.db.database;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import io.minestack.db.entity.UBungeeType;
-import io.minestack.db.entity.UPlayer;
-import io.minestack.db.entity.UServerType;
+import io.minestack.db.entity.DCBungeeType;
+import io.minestack.db.entity.DCPlayer;
+import io.minestack.db.entity.DCServerType;
 import io.minestack.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
@@ -13,7 +13,7 @@ import org.bson.types.ObjectId;
 import java.util.UUID;
 
 @Log4j2
-public class PlayerLoader extends EntityLoader<UPlayer> {
+public class PlayerLoader extends EntityLoader<DCPlayer> {
 
     private final ServerTypeLoader serverTypeLoader;
     private final BungeeTypeLoader bungeeTypeLoader;
@@ -34,7 +34,7 @@ public class PlayerLoader extends EntityLoader<UPlayer> {
         getDb().createIndex(getCollection(), index);
     }
 
-    public UPlayer loadPlayer(UUID uuid) {
+    public DCPlayer loadPlayer(UUID uuid) {
         if (uuid == null) {
             log.error("Error loading player. uuid null");
             return null;
@@ -47,14 +47,14 @@ public class PlayerLoader extends EntityLoader<UPlayer> {
     }
 
     @Override
-    public UPlayer loadEntity(ObjectId _id) {
+    public DCPlayer loadEntity(ObjectId _id) {
         if (_id == null) {
             log.error("Error loading player. _id null");
             return null;
         }
         DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("_id", _id));
         if (dbObject != null) {
-            UPlayer player = new UPlayer();
+            DCPlayer player = new DCPlayer();
             player.set_id(_id);
             player.setUuid(UUID.fromString((String) dbObject.get("uuid")));
             player.setPlayerName((String)dbObject.get("name"));
@@ -62,8 +62,8 @@ public class PlayerLoader extends EntityLoader<UPlayer> {
             BasicDBList lastServerTypes = (BasicDBList) dbObject.get("lastServerTypes");
             for (Object obj : lastServerTypes) {
                 BasicDBObject lastType = (BasicDBObject) obj;
-                UBungeeType bungeeType = bungeeTypeLoader.loadEntity((ObjectId)lastType.get("_bungeeType"));
-                UServerType serverType = serverTypeLoader.loadEntity((ObjectId)lastType.get("_serverType"));
+                DCBungeeType bungeeType = bungeeTypeLoader.loadEntity((ObjectId)lastType.get("_bungeeType"));
+                DCServerType serverType = serverTypeLoader.loadEntity((ObjectId)lastType.get("_serverType"));
                 if (bungeeType != null && serverType != null) {
                     player.getLastServerTypes().put(bungeeType, serverType);
                 }
@@ -75,13 +75,13 @@ public class PlayerLoader extends EntityLoader<UPlayer> {
     }
 
     @Override
-    public void saveEntity(UPlayer entity) {
+    public void saveEntity(DCPlayer entity) {
         BasicDBObject values = new BasicDBObject();
         values.put("name", entity.getPlayerName());
 
         BasicDBList lastServerTypes = new BasicDBList();
-        for (UBungeeType bungeeType : entity.getLastServerTypes().keySet()) {
-            UServerType serverType = entity.getLastServerTypes().get(bungeeType);
+        for (DCBungeeType bungeeType : entity.getLastServerTypes().keySet()) {
+            DCServerType serverType = entity.getLastServerTypes().get(bungeeType);
             BasicDBObject lastType = new BasicDBObject();
             lastType.put("_bungeeType", bungeeType.get_id());
             lastType.put("_serverType", serverType.get_id());
@@ -95,7 +95,7 @@ public class PlayerLoader extends EntityLoader<UPlayer> {
     }
 
     @Override
-    public ObjectId insertEntity(UPlayer entity) {
+    public ObjectId insertEntity(DCPlayer entity) {
         BasicDBObject dbObject = new BasicDBObject("_id", new ObjectId());
 
         dbObject.put("uuid", entity.getUuid().toString());
@@ -108,7 +108,7 @@ public class PlayerLoader extends EntityLoader<UPlayer> {
     }
 
     @Override
-    public void removeEntity(UPlayer entity) {
+    public void removeEntity(DCPlayer entity) {
 
     }
 }

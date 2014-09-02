@@ -6,7 +6,7 @@ import org.bson.types.ObjectId;
 
 import java.util.HashMap;
 
-public class UPlugin extends UEntity {
+public class DCPlugin extends DCEntity {
 
     @Getter
     @Setter
@@ -38,7 +38,7 @@ public class UPlugin extends UEntity {
 
     }
 
-    public static class PluginConfig extends UEntity {
+    public static class PluginConfig extends DCEntity {
 
         @Getter
         @Setter
