@@ -1,6 +1,6 @@
-MN2-Database
+Uranium
 ============
 
-[![Build Status](https://travis-ci.org/MultiNodeMinecraftNetwork/MN2-Database.svg?branch=master)](https://travis-ci.org/MultiNodeMinecraftNetwork/MN2-Database)
+[![Build Status](https://travis-ci.org/Minestack/Uranium.svg?branch=master)](https://travis-ci.org/Minestack/Uranium)
 
-Database library for all MN2 Java applications
+Database library for Minestack

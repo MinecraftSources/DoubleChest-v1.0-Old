@@ -1,6 +1,9 @@
-package com.rmb938.mn2.docker.db.entity;
+package io.minestack.db.entity;
 
 
+import io.minestack.db.entity.MN2Entity;
+import io.minestack.db.entity.MN2Plugin;
+import io.minestack.db.entity.MN2ServerType;
 import lombok.Getter;
 import lombok.Setter;
 

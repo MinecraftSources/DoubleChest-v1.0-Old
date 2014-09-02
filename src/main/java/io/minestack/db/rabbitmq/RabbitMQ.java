@@ -1,4 +1,4 @@
-package com.rmb938.mn2.docker.db.rabbitmq;
+package io.minestack.db.rabbitmq;
 
 import com.rabbitmq.client.Address;
 import com.rabbitmq.client.Connection;

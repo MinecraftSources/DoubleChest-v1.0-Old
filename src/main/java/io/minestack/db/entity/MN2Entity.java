@@ -1,4 +1,4 @@
-package com.rmb938.mn2.docker.db.entity;
+package io.minestack.db.entity;
 
 import lombok.Getter;
 import lombok.Setter;

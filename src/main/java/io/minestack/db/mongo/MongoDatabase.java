@@ -1,4 +1,4 @@
-package com.rmb938.mn2.docker.db.mongo;
+package io.minestack.db.mongo;
 
 import com.mongodb.*;
 import lombok.extern.log4j.Log4j2;
