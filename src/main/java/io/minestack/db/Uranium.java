@@ -46,9 +46,9 @@ public class Uranium {
     private static Uranium database;
 
     public static void initDatabase(List<ServerAddress> mongoAddresses, List<Address> rabbitAddresses, String rabbitUsername, String rabbitPassword) throws Exception {
-        if (Uranium.database != null) {
+        if (Uranium.database == null) {
             Uranium.needsInit = false;
-            Uranium.database = new Uranium(mongoAddresses, rabbitAddresses, rabbitUsername, rabbitPassword);
+            database = new Uranium(mongoAddresses, rabbitAddresses, rabbitUsername, rabbitPassword);
         }
     }
 
@@ -66,14 +66,14 @@ public class Uranium {
             log.info("Setting up RabbitMQ");
             rabbitMQ = new RabbitMQ(rabbitAddresses, rabbitUsername, rabbitPassword);
 
-        Uranium.pluginLoader = new PluginLoader(mongoDatabase);
-        Uranium.worldLoader = new WorldLoader(mongoDatabase);
-        Uranium.serverTypeLoader = new ServerTypeLoader(mongoDatabase, Uranium.getPluginLoader(), Uranium.getWorldLoader());
-        Uranium.bungeeTypeLoader = new BungeeTypeLoader(mongoDatabase, Uranium.getPluginLoader(), Uranium.getServerTypeLoader());
-        Uranium.nodeLoader = new NodeLoader(mongoDatabase, Uranium.getBungeeTypeLoader());
-        Uranium.bungeeLoader = new BungeeLoader(mongoDatabase, Uranium.getBungeeTypeLoader(), Uranium.getNodeLoader());
-        Uranium.playerLoader = new PlayerLoader(mongoDatabase, Uranium.getServerTypeLoader(), Uranium.getBungeeTypeLoader());
-        Uranium.serverLoader = new ServerLoader(mongoDatabase, Uranium.getNodeLoader(), Uranium.getServerTypeLoader(), Uranium.getPlayerLoader());
+        pluginLoader = new PluginLoader(mongoDatabase);
+        worldLoader = new WorldLoader(mongoDatabase);
+        serverTypeLoader = new ServerTypeLoader(mongoDatabase, getPluginLoader(), getWorldLoader());
+        bungeeTypeLoader = new BungeeTypeLoader(mongoDatabase, getPluginLoader(), getServerTypeLoader());
+        nodeLoader = new NodeLoader(mongoDatabase, getBungeeTypeLoader());
+        bungeeLoader = new BungeeLoader(mongoDatabase, getBungeeTypeLoader(), getNodeLoader());
+        playerLoader = new PlayerLoader(mongoDatabase, getServerTypeLoader(), getBungeeTypeLoader());
+        serverLoader = new ServerLoader(mongoDatabase, getNodeLoader(), getServerTypeLoader(), getPlayerLoader());
     }
 
 }
