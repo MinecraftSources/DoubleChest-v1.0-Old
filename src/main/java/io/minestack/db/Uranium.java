@@ -8,7 +8,6 @@ import io.minestack.db.rabbitmq.RabbitMQ;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
-import java.io.IOException;
 import java.util.List;
 
 @Log4j2
@@ -38,34 +37,34 @@ public class Uranium {
     @Getter
     private static PlayerLoader playerLoader;
 
-    private Uranium database;
+    @Getter
+    private static RabbitMQ rabbitMQ;
 
-    public void initDatabase(List<ServerAddress> mongoAddresses, List<Address> rabbitAddresses, String rabbitUsername, String rabbitPassword) {
-        if (database != null) {
-            database = new Uranium(mongoAddresses, rabbitAddresses, rabbitUsername, rabbitPassword);
+    @Getter
+    private static boolean needsInit = true;
+
+    private static Uranium database;
+
+    public static void initDatabase(List<ServerAddress> mongoAddresses, List<Address> rabbitAddresses, String rabbitUsername, String rabbitPassword) throws Exception {
+        if (Uranium.database != null) {
+            Uranium.needsInit = false;
+            Uranium.database = new Uranium(mongoAddresses, rabbitAddresses, rabbitUsername, rabbitPassword);
         }
     }
 
-    private Uranium(List<ServerAddress> mongoAddresses, List<Address> rabbitAddresses, String rabbitUsername, String rabbitPassword) {
+    private Uranium(List<ServerAddress> mongoAddresses, List<Address> rabbitAddresses, String rabbitUsername, String rabbitPassword) throws Exception {
         if (mongoAddresses.isEmpty()) {
-            log.error("No valid mongo addresses");
-            return;
+            throw new Exception("No valid mongo addresses");
         }
         log.info("Setting up mongo database minestack");
         MongoDatabase mongoDatabase = new MongoDatabase(mongoAddresses, "minestack");
 
         if (rabbitAddresses.isEmpty()) {
-            log.error("No valid RabbitMQ addresses");
-            return;
+            throw new Exception("No valid RabbitMQ addresses");
         }
 
-        RabbitMQ rabbitMQ = null;
-        try {
             log.info("Setting up RabbitMQ");
             rabbitMQ = new RabbitMQ(rabbitAddresses, rabbitUsername, rabbitPassword);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         Uranium.pluginLoader = new PluginLoader(mongoDatabase);
         Uranium.worldLoader = new WorldLoader(mongoDatabase);
