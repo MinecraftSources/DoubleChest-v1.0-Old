@@ -1,18 +1,17 @@
 package io.minestack.db.entity;
 
-import io.minestack.db.entity.MN2Entity;
 import lombok.Getter;
 import lombok.Setter;
 
-public class MN2Bungee extends MN2Entity {
+public class UBungee extends UEntity {
 
     @Getter
     @Setter
-    private MN2BungeeType bungeeType;
+    private UBungeeType bungeeType;
 
     @Getter
     @Setter
-    private MN2Node node;
+    private UNode node;
 
     @Getter
     @Setter

@@ -6,7 +6,7 @@ import org.bson.types.ObjectId;
 
 import java.util.HashMap;
 
-public class MN2Plugin extends MN2Entity {
+public class UPlugin extends UEntity {
 
     @Getter
     @Setter
@@ -38,7 +38,7 @@ public class MN2Plugin extends MN2Entity {
 
     }
 
-    public static class PluginConfig extends MN2Entity {
+    public static class PluginConfig extends UEntity {
 
         @Getter
         @Setter

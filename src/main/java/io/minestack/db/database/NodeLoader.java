@@ -3,8 +3,8 @@ package io.minestack.db.database;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import io.minestack.db.entity.MN2BungeeType;
-import io.minestack.db.entity.MN2Node;
+import io.minestack.db.entity.UBungeeType;
+import io.minestack.db.entity.UNode;
 import io.minestack.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
@@ -12,7 +12,7 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 
 @Log4j2
-public class NodeLoader extends EntityLoader<MN2Node> {
+public class NodeLoader extends EntityLoader<UNode> {
 
     private final BungeeTypeLoader bungeeTypeLoader;
 
@@ -21,12 +21,12 @@ public class NodeLoader extends EntityLoader<MN2Node> {
         this.bungeeTypeLoader = bungeeTypeLoader;
     }
 
-    public MN2Node getMaster() {
+    public UNode getMaster() {
         DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis()-30000)));
         dbCursor = dbCursor.sort(new BasicDBObject("_id", 1));
         if (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
-            MN2Node node = loadEntity((ObjectId)dbObject.get("_id"));
+            UNode node = loadEntity((ObjectId)dbObject.get("_id"));
             dbCursor.close();
             return node;
         }
@@ -34,12 +34,12 @@ public class NodeLoader extends EntityLoader<MN2Node> {
         return null;
     }
 
-    public ArrayList<MN2Node> getNodes() {
-        ArrayList<MN2Node> nodes = new ArrayList<>();
+    public ArrayList<UNode> getNodes() {
+        ArrayList<UNode> nodes = new ArrayList<>();
         DBCursor dbCursor = getDb().findMany(getCollection());
         while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
-            MN2Node node = loadEntity((ObjectId)dbObject.get("_id"));
+            UNode node = loadEntity((ObjectId)dbObject.get("_id"));
             if (node != null) {
                 nodes.add(node);
             }
@@ -48,12 +48,12 @@ public class NodeLoader extends EntityLoader<MN2Node> {
         return nodes;
     }
 
-    public ArrayList<MN2Node> getOnlineNodes() {
-        ArrayList<MN2Node> nodes = new ArrayList<>();
+    public ArrayList<UNode> getOnlineNodes() {
+        ArrayList<UNode> nodes = new ArrayList<>();
         DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis()-30000)));
         while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
-            MN2Node node = loadEntity((ObjectId)dbObject.get("_id"));
+            UNode node = loadEntity((ObjectId)dbObject.get("_id"));
             if (node != null) {
                 nodes.add(node);
             }
@@ -63,14 +63,14 @@ public class NodeLoader extends EntityLoader<MN2Node> {
     }
 
     @Override
-    public MN2Node loadEntity(ObjectId _id) {
+    public UNode loadEntity(ObjectId _id) {
         if (_id == null) {
             log.error("Error loading node. _id null");
             return null;
         }
         DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("_id", _id));
         if (dbObject != null) {
-            MN2Node node = new MN2Node();
+            UNode node = new UNode();
             node.set_id(_id);
             node.setAddress((String) dbObject.get("host"));
             node.setRam((Integer) dbObject.get("ram"));
@@ -83,7 +83,7 @@ public class NodeLoader extends EntityLoader<MN2Node> {
 
             ObjectId _bungeeTypeId = (ObjectId) dbObject.get("_bungeeType");
             if (_bungeeTypeId != null) {
-                MN2BungeeType bungeeType = bungeeTypeLoader.loadEntity(_bungeeTypeId);
+                UBungeeType bungeeType = bungeeTypeLoader.loadEntity(_bungeeTypeId);
                 node.setBungeeType(bungeeType);
             }
 
@@ -94,7 +94,7 @@ public class NodeLoader extends EntityLoader<MN2Node> {
     }
 
     @Override
-    public void saveEntity(MN2Node node) {
+    public void saveEntity(UNode node) {
         BasicDBObject values = new BasicDBObject();
 
         values.put("ram", node.getRam());
@@ -110,7 +110,7 @@ public class NodeLoader extends EntityLoader<MN2Node> {
     }
 
     @Override
-    public ObjectId insertEntity(MN2Node node) {
+    public ObjectId insertEntity(UNode node) {
         BasicDBObject dbObject = new BasicDBObject("_id", new ObjectId());
 
         dbObject.put("host", node.getAddress());
@@ -126,7 +126,7 @@ public class NodeLoader extends EntityLoader<MN2Node> {
     }
 
     @Override
-    public void removeEntity(MN2Node entity) {
+    public void removeEntity(UNode entity) {
         getDb().delete(getCollection(), new BasicDBObject("_id", entity.get_id()));
     }
 }

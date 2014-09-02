@@ -6,10 +6,10 @@ import lombok.Setter;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class MN2Player extends MN2Entity {
+public class UPlayer extends UEntity {
 
     @Getter
-    private HashMap<MN2BungeeType, MN2ServerType> lastServerTypes = new HashMap<>();
+    private HashMap<UBungeeType, UServerType> lastServerTypes = new HashMap<>();
 
     @Getter
     @Setter

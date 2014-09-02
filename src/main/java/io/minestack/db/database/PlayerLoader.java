@@ -3,9 +3,9 @@ package io.minestack.db.database;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import io.minestack.db.entity.MN2BungeeType;
-import io.minestack.db.entity.MN2Player;
-import io.minestack.db.entity.MN2ServerType;
+import io.minestack.db.entity.UBungeeType;
+import io.minestack.db.entity.UPlayer;
+import io.minestack.db.entity.UServerType;
 import io.minestack.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
@@ -13,7 +13,7 @@ import org.bson.types.ObjectId;
 import java.util.UUID;
 
 @Log4j2
-public class PlayerLoader extends EntityLoader<MN2Player> {
+public class PlayerLoader extends EntityLoader<UPlayer> {
 
     private final ServerTypeLoader serverTypeLoader;
     private final BungeeTypeLoader bungeeTypeLoader;
@@ -34,7 +34,7 @@ public class PlayerLoader extends EntityLoader<MN2Player> {
         getDb().createIndex(getCollection(), index);
     }
 
-    public MN2Player loadPlayer(UUID uuid) {
+    public UPlayer loadPlayer(UUID uuid) {
         if (uuid == null) {
             log.error("Error loading player. uuid null");
             return null;
@@ -47,14 +47,14 @@ public class PlayerLoader extends EntityLoader<MN2Player> {
     }
 
     @Override
-    public MN2Player loadEntity(ObjectId _id) {
+    public UPlayer loadEntity(ObjectId _id) {
         if (_id == null) {
             log.error("Error loading player. _id null");
             return null;
         }
         DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("_id", _id));
         if (dbObject != null) {
-            MN2Player player = new MN2Player();
+            UPlayer player = new UPlayer();
             player.set_id(_id);
             player.setUuid(UUID.fromString((String) dbObject.get("uuid")));
             player.setPlayerName((String)dbObject.get("name"));
@@ -62,8 +62,8 @@ public class PlayerLoader extends EntityLoader<MN2Player> {
             BasicDBList lastServerTypes = (BasicDBList) dbObject.get("lastServerTypes");
             for (Object obj : lastServerTypes) {
                 BasicDBObject lastType = (BasicDBObject) obj;
-                MN2BungeeType bungeeType = bungeeTypeLoader.loadEntity((ObjectId)lastType.get("_bungeeType"));
-                MN2ServerType serverType = serverTypeLoader.loadEntity((ObjectId)lastType.get("_serverType"));
+                UBungeeType bungeeType = bungeeTypeLoader.loadEntity((ObjectId)lastType.get("_bungeeType"));
+                UServerType serverType = serverTypeLoader.loadEntity((ObjectId)lastType.get("_serverType"));
                 if (bungeeType != null && serverType != null) {
                     player.getLastServerTypes().put(bungeeType, serverType);
                 }
@@ -75,13 +75,13 @@ public class PlayerLoader extends EntityLoader<MN2Player> {
     }
 
     @Override
-    public void saveEntity(MN2Player entity) {
+    public void saveEntity(UPlayer entity) {
         BasicDBObject values = new BasicDBObject();
         values.put("name", entity.getPlayerName());
 
         BasicDBList lastServerTypes = new BasicDBList();
-        for (MN2BungeeType bungeeType : entity.getLastServerTypes().keySet()) {
-            MN2ServerType serverType = entity.getLastServerTypes().get(bungeeType);
+        for (UBungeeType bungeeType : entity.getLastServerTypes().keySet()) {
+            UServerType serverType = entity.getLastServerTypes().get(bungeeType);
             BasicDBObject lastType = new BasicDBObject();
             lastType.put("_bungeeType", bungeeType.get_id());
             lastType.put("_serverType", serverType.get_id());
@@ -95,7 +95,7 @@ public class PlayerLoader extends EntityLoader<MN2Player> {
     }
 
     @Override
-    public ObjectId insertEntity(MN2Player entity) {
+    public ObjectId insertEntity(UPlayer entity) {
         BasicDBObject dbObject = new BasicDBObject("_id", new ObjectId());
 
         dbObject.put("uuid", entity.getUuid().toString());
@@ -108,7 +108,7 @@ public class PlayerLoader extends EntityLoader<MN2Player> {
     }
 
     @Override
-    public void removeEntity(MN2Player entity) {
+    public void removeEntity(UPlayer entity) {
 
     }
 }

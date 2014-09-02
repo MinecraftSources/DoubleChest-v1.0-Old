@@ -3,7 +3,7 @@ package io.minestack.db.database;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import io.minestack.db.entity.MN2World;
+import io.minestack.db.entity.UWorld;
 import io.minestack.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
@@ -11,18 +11,18 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 
 @Log4j2
-public class WorldLoader extends EntityLoader<MN2World> {
+public class WorldLoader extends EntityLoader<UWorld> {
 
     public WorldLoader(MongoDatabase db) {
         super(db, "worlds");
     }
 
-    public ArrayList<MN2World> getWorlds() {
-        ArrayList<MN2World> worlds = new ArrayList<>();
+    public ArrayList<UWorld> getWorlds() {
+        ArrayList<UWorld> worlds = new ArrayList<>();
         DBCursor dbCursor = getDb().findMany(getCollection());
         while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
-            MN2World world = loadEntity((ObjectId) dbObject.get("_id"));
+            UWorld world = loadEntity((ObjectId) dbObject.get("_id"));
             if (world != null) {
                 worlds.add(world);
             }
@@ -33,19 +33,19 @@ public class WorldLoader extends EntityLoader<MN2World> {
     }
 
     @Override
-    public MN2World loadEntity(ObjectId _id) {
+    public UWorld loadEntity(ObjectId _id) {
         if (_id == null) {
             log.error("Error loading world. _id null");
             return null;
         }
         DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("_id", _id));
         if (dbObject != null) {
-            MN2World world = new MN2World();
+            UWorld world = new UWorld();
             world.set_id(_id);
             world.setName((String) dbObject.get("name"));
             world.setFolder((String) dbObject.get("folder"));
             try {
-                world.setEnvironment(MN2World.Environment.valueOf((String) dbObject.get("environment")));
+                world.setEnvironment(UWorld.Environment.valueOf((String) dbObject.get("environment")));
             } catch (Exception ex) {
                 log.error("Invalid environment for world "+world.getName());
                 return null;
@@ -60,7 +60,7 @@ public class WorldLoader extends EntityLoader<MN2World> {
     }
 
     @Override
-    public void saveEntity(MN2World world) {
+    public void saveEntity(UWorld world) {
         BasicDBObject values = new BasicDBObject();
 
         values.put("name", world.getName());
@@ -74,7 +74,7 @@ public class WorldLoader extends EntityLoader<MN2World> {
     }
 
     @Override
-    public ObjectId insertEntity(MN2World world) {
+    public ObjectId insertEntity(UWorld world) {
         BasicDBObject dbObject = new BasicDBObject("_id", new ObjectId());
 
         dbObject.put("name", world.getName());
@@ -87,7 +87,7 @@ public class WorldLoader extends EntityLoader<MN2World> {
     }
 
     @Override
-    public void removeEntity(MN2World entity) {
+    public void removeEntity(UWorld entity) {
         getDb().remove(getCollection(), new BasicDBObject("_id", entity.get_id()));
     }
 }

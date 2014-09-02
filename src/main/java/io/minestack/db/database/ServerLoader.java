@@ -4,10 +4,9 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import io.minestack.db.entity.MN2Node;
-import io.minestack.db.entity.MN2Player;
-import io.minestack.db.entity.MN2Server;
-import io.minestack.db.entity.MN2ServerType;
+import io.minestack.db.entity.*;
+import io.minestack.db.entity.UServerType;
+import io.minestack.db.entity.UServer;
 import io.minestack.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
@@ -15,7 +14,7 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 
 @Log4j2
-public class ServerLoader extends EntityLoader<MN2Server> {
+public class ServerLoader extends EntityLoader<UServer> {
 
     private final PlayerLoader playerLoader;
     private final NodeLoader nodeLoader;
@@ -51,11 +50,11 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         getDb().createIndex(getCollection(), index, options);
     }
 
-    public Long getCount(MN2ServerType serverType) {
+    public Long getCount(UServerType serverType) {
         return getDb().count(getCollection(), new BasicDBObject("_servertype", serverType.get_id()));
     }
 
-    public MN2Server getServer(MN2ServerType serverType, int number) {
+    public UServer getServer(UServerType serverType, int number) {
         if (serverType == null) {
             return null;
         }
@@ -70,7 +69,7 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         return null;
     }
 
-    private int getNextNumber(MN2ServerType serverType) {
+    private int getNextNumber(UServerType serverType) {
         int number = 1;
         BasicDBList and = new BasicDBList();
         and.add(new BasicDBObject("_servertype", serverType.get_id()));
@@ -88,13 +87,13 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         return number;
     }
 
-    public ArrayList<MN2Server> getNodeServers(MN2Node node) {
-        ArrayList<MN2Server> servers = new ArrayList<>();
+    public ArrayList<UServer> getNodeServers(UNode node) {
+        ArrayList<UServer> servers = new ArrayList<>();
 
         DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("_node", node.get_id()));
         while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
-            MN2Server server = loadEntity((ObjectId) dbObject.get("_id"));
+            UServer server = loadEntity((ObjectId) dbObject.get("_id"));
             if (server != null) {
                 servers.add(server);
             }
@@ -103,15 +102,15 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         return servers;
     }
 
-    public ArrayList<MN2Server> getServers() {
-        ArrayList<MN2Server> servers = new ArrayList<>();
+    public ArrayList<UServer> getServers() {
+        ArrayList<UServer> servers = new ArrayList<>();
 
         DBCursor dbCursor = getDb().findMany(getCollection());
         dbCursor.sort(new BasicDBObject("_servertype", 1));
         dbCursor.sort(new BasicDBObject("number", 1));
         while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
-            MN2Server server = loadEntity((ObjectId) dbObject.get("_id"));
+            UServer server = loadEntity((ObjectId) dbObject.get("_id"));
             if (server != null) {
                 servers.add(server);
             }
@@ -120,8 +119,8 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         return servers;
     }
 
-    public ArrayList<MN2Server> getTypeServers(MN2ServerType serverType) {
-        ArrayList<MN2Server> servers = new ArrayList<>();
+    public ArrayList<UServer> getTypeServers(UServerType serverType) {
+        ArrayList<UServer> servers = new ArrayList<>();
 
         if (serverType == null) {
             return servers;
@@ -130,7 +129,7 @@ public class ServerLoader extends EntityLoader<MN2Server> {
         DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("_servertype", serverType.get_id()));
         while (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
-            MN2Server server = loadEntity((ObjectId) dbObject.get("_id"));
+            UServer server = loadEntity((ObjectId) dbObject.get("_id"));
             if (server != null) {
                 servers.add(server);
             }
@@ -140,14 +139,14 @@ public class ServerLoader extends EntityLoader<MN2Server> {
     }
 
     @Override
-    public MN2Server loadEntity(ObjectId _id) {
+    public UServer loadEntity(ObjectId _id) {
         if (_id == null) {
             log.error("Error loading server. _id null");
             return null;
         }
         DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("_id", _id));
         if (dbObject != null) {
-            MN2Server server = new MN2Server();
+            UServer server = new UServer();
             server.set_id((ObjectId) dbObject.get("_id"));
             server.setServerType(serverTypeLoader.loadEntity((ObjectId) dbObject.get("_servertype")));
             server.setNode(nodeLoader.loadEntity((ObjectId) dbObject.get("_node")));
@@ -160,7 +159,7 @@ public class ServerLoader extends EntityLoader<MN2Server> {
             for (Object object : players) {
                 DBObject dbObj = (DBObject) object;
                 ObjectId _playerId = (ObjectId) dbObj.get("_id");
-                MN2Player player = playerLoader.loadEntity(_playerId);
+                UPlayer player = playerLoader.loadEntity(_playerId);
                 if (player != null) {
                     server.getPlayers().add(player);
                 }
@@ -172,14 +171,14 @@ public class ServerLoader extends EntityLoader<MN2Server> {
     }
 
     @Override
-    public void saveEntity(MN2Server server) {
+    public void saveEntity(UServer server) {
         BasicDBObject values = new BasicDBObject();
         values.put("lastUpdate", server.getLastUpdate());
         values.put("containerId", server.getContainerId());
         values.put("port", server.getPort());
 
         BasicDBList players = new BasicDBList();
-        for (MN2Player player : server.getPlayers()) {
+        for (UPlayer player : server.getPlayers()) {
             BasicDBObject dbObject = new BasicDBObject("_id", player.get_id());
             players.add(dbObject);
         }
@@ -192,7 +191,7 @@ public class ServerLoader extends EntityLoader<MN2Server> {
     }
 
     @Override
-    public ObjectId insertEntity(MN2Server server) {
+    public ObjectId insertEntity(UServer server) {
         BasicDBObject dbObject = new BasicDBObject("_id", new ObjectId());
         dbObject.append("_servertype", server.getServerType().get_id());
         dbObject.append("_node", server.getNode().get_id());
@@ -206,7 +205,7 @@ public class ServerLoader extends EntityLoader<MN2Server> {
     }
 
     @Override
-    public void removeEntity(MN2Server entity) {
+    public void removeEntity(UServer entity) {
         getDb().delete(getCollection(), new BasicDBObject("_id", entity.get_id()));
     }
 }

@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 
-public abstract class MN2Entity {
+public abstract class UEntity {
 
     @Getter
     @Setter

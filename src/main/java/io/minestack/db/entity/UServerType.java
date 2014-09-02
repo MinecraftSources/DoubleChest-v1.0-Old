@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 @Log4j2
-public class MN2ServerType extends MN2Entity {
+public class UServerType extends UEntity {
 
     @Getter
     @Setter
@@ -28,21 +28,21 @@ public class MN2ServerType extends MN2Entity {
 
     @Getter
     @Setter
-    private MN2World defaultWorld;
+    private UWorld defaultWorld;
 
     @Getter
     @Setter
     private boolean disabled;
 
     @Getter
-    private HashMap<MN2Plugin, MN2Plugin.PluginConfig> plugins = new HashMap<>();
+    private HashMap<UPlugin, UPlugin.PluginConfig> plugins = new HashMap<>();
 
     @Getter
-    private ArrayList<MN2World> worlds = new ArrayList<>();
+    private ArrayList<UWorld> worlds = new ArrayList<>();
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof MN2ServerType && get_id().equals(((MN2ServerType) obj).get_id());
+        return obj instanceof UServerType && get_id().equals(((UServerType) obj).get_id());
     }
 
     @Override

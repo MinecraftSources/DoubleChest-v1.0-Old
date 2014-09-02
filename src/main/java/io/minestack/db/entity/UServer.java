@@ -5,15 +5,15 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 
-public class MN2Server extends MN2Entity {
+public class UServer extends UEntity {
 
     @Getter
     @Setter
-    private MN2ServerType serverType;
+    private UServerType serverType;
 
     @Getter
     @Setter
-    private MN2Node node;
+    private UNode node;
 
     @Getter
     @Setter
@@ -32,6 +32,6 @@ public class MN2Server extends MN2Entity {
     private int port;
 
     @Getter
-    private ArrayList<MN2Player> players = new ArrayList<>();
+    private ArrayList<UPlayer> players = new ArrayList<>();
 
 }
