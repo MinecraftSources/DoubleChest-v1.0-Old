@@ -32,6 +32,10 @@ public class DCServer extends DCEntity {
     private int port;
 
     @Getter
+    @Setter
+    private String containerAddress;
+
+    @Getter
     private ArrayList<DCPlayer> players = new ArrayList<>();
 
 }

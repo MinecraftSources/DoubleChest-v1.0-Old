@@ -22,15 +22,23 @@ public class NodeLoader extends EntityLoader<DCNode> {
     }
 
     public DCNode getMaster() {
+        log.info("Finding Master");
+        long start = System.currentTimeMillis();
         DBCursor dbCursor = getDb().findMany(getCollection(), new BasicDBObject("lastUpdate", new BasicDBObject("$gt", System.currentTimeMillis()-30000)));
         dbCursor = dbCursor.sort(new BasicDBObject("_id", 1));
         if (dbCursor.hasNext()) {
             DBObject dbObject = dbCursor.next();
             DCNode node = loadEntity((ObjectId)dbObject.get("_id"));
-            dbCursor.close();
-            return node;
+            if (node != null) {
+                dbCursor.close();
+                long end = System.currentTimeMillis();
+                log.info("Found Master "+node.getAddress()+" "+(end-start));
+                return node;
+            }
         }
         dbCursor.close();
+        long end = System.currentTimeMillis();
+        log.error("Could not find master "+(end-start));
         return null;
     }
 

@@ -150,9 +150,10 @@ public class ServerLoader extends EntityLoader<DCServer> {
             server.set_id((ObjectId) dbObject.get("_id"));
             server.setServerType(serverTypeLoader.loadEntity((ObjectId) dbObject.get("_servertype")));
             server.setNode(nodeLoader.loadEntity((ObjectId) dbObject.get("_node")));
-            server.setContainerId((String) dbObject.get("containerId"));
             server.setLastUpdate((Long) dbObject.get("lastUpdate"));
             server.setNumber((Integer) dbObject.get("number"));
+            server.setContainerId((String) dbObject.get("containerId"));
+            server.setContainerAddress((String) dbObject.get("containerAddress"));
             server.setPort((Integer) dbObject.get("port"));
 
             BasicDBList players = (BasicDBList) dbObject.get("players");
@@ -175,6 +176,7 @@ public class ServerLoader extends EntityLoader<DCServer> {
         BasicDBObject values = new BasicDBObject();
         values.put("lastUpdate", server.getLastUpdate());
         values.put("containerId", server.getContainerId());
+        values.put("containerAddress", server.getContainerAddress());
         values.put("port", server.getPort());
 
         BasicDBList players = new BasicDBList();
@@ -197,6 +199,7 @@ public class ServerLoader extends EntityLoader<DCServer> {
         dbObject.append("_node", server.getNode().get_id());
         dbObject.append("lastUpdate", server.getLastUpdate());
         dbObject.append("containerId", "NULL");
+        dbObject.append("containerAddress", "NULL");
         dbObject.append("port", -1);
         dbObject.append("players", new BasicDBList());
         dbObject.append("number", getNextNumber(server.getServerType()));
