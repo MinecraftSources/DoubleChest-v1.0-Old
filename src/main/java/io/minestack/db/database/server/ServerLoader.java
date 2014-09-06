@@ -1,12 +1,18 @@
-package io.minestack.db.database;
+package io.minestack.db.database.server;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import io.minestack.db.entity.*;
-import io.minestack.db.entity.DCServerType;
-import io.minestack.db.entity.DCServer;
+import io.minestack.db.database.driver.DrivableEntityLoader;
+import io.minestack.db.database.driver.DriverLoader;
+import io.minestack.db.database.node.NodeLoader;
+import io.minestack.db.database.player.PlayerLoader;
+import io.minestack.db.database.server.driver.bukkit.BukkitDriverLoader;
+import io.minestack.db.entity.DCNode;
+import io.minestack.db.entity.DCPlayer;
+import io.minestack.db.entity.server.DCServer;
+import io.minestack.db.entity.server.DCServerType;
 import io.minestack.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
@@ -14,7 +20,7 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 
 @Log4j2
-public class ServerLoader extends EntityLoader<DCServer> {
+public class ServerLoader extends DrivableEntityLoader<DCServer> {
 
     private final PlayerLoader playerLoader;
     private final NodeLoader nodeLoader;
@@ -48,6 +54,9 @@ public class ServerLoader extends EntityLoader<DCServer> {
         index.put("_servertype", 1);
         index.put("number", 1);
         getDb().createIndex(getCollection(), index, options);
+
+        DriverLoader driverLoader = new BukkitDriverLoader(db, getCollection());
+        getDrivers().put(driverLoader.getDriverName(), driverLoader);
     }
 
     public Long getCount(DCServerType serverType) {
@@ -139,76 +148,55 @@ public class ServerLoader extends EntityLoader<DCServer> {
     }
 
     @Override
-    public DCServer loadEntity(ObjectId _id) {
-        if (_id == null) {
-            log.error("Error loading server. _id null");
-            return null;
-        }
-        DBObject dbObject = getDb().findOne(getCollection(), new BasicDBObject("_id", _id));
-        if (dbObject != null) {
-            DCServer server = new DCServer();
-            server.set_id((ObjectId) dbObject.get("_id"));
-            server.setServerType(serverTypeLoader.loadEntity((ObjectId) dbObject.get("_servertype")));
-            server.setNode(nodeLoader.loadEntity((ObjectId) dbObject.get("_node")));
-            server.setLastUpdate((Long) dbObject.get("lastUpdate"));
-            server.setNumber((Integer) dbObject.get("number"));
-            server.setContainerId((String) dbObject.get("containerId"));
-            server.setContainerAddress((String) dbObject.get("containerAddress"));
-            server.setPort((Integer) dbObject.get("port"));
+    protected DCServer loadDrivableEntity(DBObject dbObject) {
+        DCServer server = new DCServer();
+        server.set_id((ObjectId) dbObject.get("_id"));
+        server.setServerType(serverTypeLoader.loadEntity((ObjectId) dbObject.get("_servertype")));
+        server.setNode(nodeLoader.loadEntity((ObjectId) dbObject.get("_node")));
+        server.setLastUpdate((Long) dbObject.get("lastUpdate"));
+        server.setNumber((Integer) dbObject.get("number"));
+        server.setContainerId((String) dbObject.get("containerId"));
+        server.setContainerAddress((String) dbObject.get("containerAddress"));
+        server.setPort((Integer) dbObject.get("port"));
 
-            BasicDBList players = (BasicDBList) dbObject.get("players");
-            for (Object object : players) {
-                DBObject dbObj = (DBObject) object;
-                ObjectId _playerId = (ObjectId) dbObj.get("_id");
-                DCPlayer player = playerLoader.loadEntity(_playerId);
-                if (player != null) {
-                    server.getPlayers().add(player);
-                }
+        BasicDBList players = (BasicDBList) dbObject.get("players");
+        for (Object object : players) {
+            DBObject dbObj = (DBObject) object;
+            ObjectId _playerId = (ObjectId) dbObj.get("_id");
+            DCPlayer player = playerLoader.loadEntity(_playerId);
+            if (player != null) {
+                server.getPlayers().add(player);
             }
-
-            return server;
         }
-        return null;
+
+        return server;
     }
 
     @Override
-    public void saveEntity(DCServer server) {
-        BasicDBObject values = new BasicDBObject();
-        values.put("lastUpdate", server.getLastUpdate());
-        values.put("containerId", server.getContainerId());
-        values.put("containerAddress", server.getContainerAddress());
-        values.put("port", server.getPort());
+    protected void saveDrivableEntity(DCServer entity, DBObject entityObject) {
+        entityObject.put("lastUpdate", entity.getLastUpdate());
+        entityObject.put("containerId", entity.getContainerId());
+        entityObject.put("containerAddress", entity.getContainerAddress());
+        entityObject.put("port", entity.getPort());
 
         BasicDBList players = new BasicDBList();
-        for (DCPlayer player : server.getPlayers()) {
+        for (DCPlayer player : entity.getPlayers()) {
             BasicDBObject dbObject = new BasicDBObject("_id", player.get_id());
             players.add(dbObject);
         }
 
-        values.put("players", players);
-
-        BasicDBObject set = new BasicDBObject("$set", values);
-        getDb().updateDocument(getCollection(), new BasicDBObject("_id", server.get_id()), set);
-        log.info("Saving Server " + server.get_id());
+        entityObject.put("players", players);
     }
 
     @Override
-    public ObjectId insertEntity(DCServer server) {
-        BasicDBObject dbObject = new BasicDBObject("_id", new ObjectId());
-        dbObject.append("_servertype", server.getServerType().get_id());
-        dbObject.append("_node", server.getNode().get_id());
-        dbObject.append("lastUpdate", server.getLastUpdate());
-        dbObject.append("containerId", "NULL");
-        dbObject.append("containerAddress", "NULL");
-        dbObject.append("port", -1);
-        dbObject.append("players", new BasicDBList());
-        dbObject.append("number", getNextNumber(server.getServerType()));
-        getDb().insert(getCollection(), dbObject);
-        return (ObjectId) dbObject.get("_id");
-    }
-
-    @Override
-    public void removeEntity(DCServer entity) {
-        getDb().delete(getCollection(), new BasicDBObject("_id", entity.get_id()));
+    protected void insertDrivableEntity(DCServer entity, DBObject entityObject) {
+        entityObject.put("_servertype", entity.getServerType().get_id());
+        entityObject.put("_node", entity.getNode().get_id());
+        entityObject.put("lastUpdate", entity.getLastUpdate());
+        entityObject.put("containerId", "NULL");
+        entityObject.put("containerAddress", "NULL");
+        entityObject.put("port", -1);
+        entityObject.put("players", new BasicDBList());
+        entityObject.put("number", getNextNumber(entity.getServerType()));
     }
 }

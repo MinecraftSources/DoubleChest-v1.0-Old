@@ -1,6 +1,6 @@
 DoubleChest
 ============
 
-[![Build Status](https://travis-ci.org/Minestack/Uranium.svg?branch=master)](https://travis-ci.org/Minestack/Uranium)
+[![Build Status](https://travis-ci.org/Minestack/DoubleChest.svg?branch=master)](https://travis-ci.org/Minestack/DoubleChest)
 
 Database library for Minestack

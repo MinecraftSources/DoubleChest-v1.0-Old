@@ -2,7 +2,14 @@ package io.minestack.db;
 
 import com.mongodb.ServerAddress;
 import com.rabbitmq.client.Address;
-import io.minestack.db.database.*;
+import io.minestack.db.database.node.NodeLoader;
+import io.minestack.db.database.player.PlayerLoader;
+import io.minestack.db.database.plugin.PluginLoader;
+import io.minestack.db.database.proxy.ProxyLoader;
+import io.minestack.db.database.proxy.ProxyTypeLoader;
+import io.minestack.db.database.server.ServerLoader;
+import io.minestack.db.database.server.ServerTypeLoader;
+import io.minestack.db.database.world.WorldLoader;
 import io.minestack.db.mongo.MongoDatabase;
 import io.minestack.db.rabbitmq.RabbitMQ;
 import lombok.Getter;
@@ -17,10 +24,10 @@ public class DoubleChest {
     private static NodeLoader nodeLoader;
 
     @Getter
-    private static BungeeLoader bungeeLoader;
+    private static ProxyLoader proxyLoader;
 
     @Getter
-    private static BungeeTypeLoader bungeeTypeLoader;
+    private static ProxyTypeLoader proxyTypeLoader;
 
     @Getter
     private static ServerTypeLoader serverTypeLoader;
@@ -69,10 +76,10 @@ public class DoubleChest {
         pluginLoader = new PluginLoader(mongoDatabase);
         worldLoader = new WorldLoader(mongoDatabase);
         serverTypeLoader = new ServerTypeLoader(mongoDatabase, getPluginLoader(), getWorldLoader());
-        bungeeTypeLoader = new BungeeTypeLoader(mongoDatabase, getPluginLoader(), getServerTypeLoader());
-        nodeLoader = new NodeLoader(mongoDatabase, getBungeeTypeLoader());
-        bungeeLoader = new BungeeLoader(mongoDatabase, getBungeeTypeLoader(), getNodeLoader());
-        playerLoader = new PlayerLoader(mongoDatabase, getServerTypeLoader(), getBungeeTypeLoader());
+        proxyTypeLoader = new ProxyTypeLoader(mongoDatabase, getServerTypeLoader(), getPluginLoader());
+        nodeLoader = new NodeLoader(mongoDatabase, getProxyTypeLoader());
+        proxyLoader = new ProxyLoader(mongoDatabase, getProxyTypeLoader(), getNodeLoader());
+        playerLoader = new PlayerLoader(mongoDatabase, getServerTypeLoader(), getProxyTypeLoader());
         serverLoader = new ServerLoader(mongoDatabase, getNodeLoader(), getServerTypeLoader(), getPlayerLoader());
     }
 

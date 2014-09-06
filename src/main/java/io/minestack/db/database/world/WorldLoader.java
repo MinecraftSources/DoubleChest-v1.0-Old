@@ -1,8 +1,9 @@
-package io.minestack.db.database;
+package io.minestack.db.database.world;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import io.minestack.db.database.EntityLoader;
 import io.minestack.db.entity.DCWorld;
 import io.minestack.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;

@@ -1,11 +1,14 @@
-package io.minestack.db.database;
+package io.minestack.db.database.player;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import io.minestack.db.entity.DCBungeeType;
+import io.minestack.db.database.EntityLoader;
+import io.minestack.db.database.proxy.ProxyTypeLoader;
+import io.minestack.db.database.server.ServerTypeLoader;
 import io.minestack.db.entity.DCPlayer;
-import io.minestack.db.entity.DCServerType;
+import io.minestack.db.entity.proxy.DCProxyType;
+import io.minestack.db.entity.server.DCServerType;
 import io.minestack.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
@@ -16,12 +19,12 @@ import java.util.UUID;
 public class PlayerLoader extends EntityLoader<DCPlayer> {
 
     private final ServerTypeLoader serverTypeLoader;
-    private final BungeeTypeLoader bungeeTypeLoader;
+    private final ProxyTypeLoader proxyTypeLoader;
 
-    public PlayerLoader(MongoDatabase db, ServerTypeLoader serverTypeLoader, BungeeTypeLoader bungeeTypeLoader) {
+    public PlayerLoader(MongoDatabase db, ServerTypeLoader serverTypeLoader, ProxyTypeLoader proxyTypeLoader) {
         super(db, "players");
         this.serverTypeLoader = serverTypeLoader;
-        this.bungeeTypeLoader = bungeeTypeLoader;
+        this.proxyTypeLoader = proxyTypeLoader;
 
         //name index
         BasicDBObject index = new BasicDBObject();
@@ -62,10 +65,10 @@ public class PlayerLoader extends EntityLoader<DCPlayer> {
             BasicDBList lastServerTypes = (BasicDBList) dbObject.get("lastServerTypes");
             for (Object obj : lastServerTypes) {
                 BasicDBObject lastType = (BasicDBObject) obj;
-                DCBungeeType bungeeType = bungeeTypeLoader.loadEntity((ObjectId)lastType.get("_bungeeType"));
+                DCProxyType proxyType = proxyTypeLoader.loadEntity((ObjectId)lastType.get("_proxyType"));
                 DCServerType serverType = serverTypeLoader.loadEntity((ObjectId)lastType.get("_serverType"));
-                if (bungeeType != null && serverType != null) {
-                    player.getLastServerTypes().put(bungeeType, serverType);
+                if (proxyType != null && serverType != null) {
+                    player.getLastServerTypes().put(proxyType, serverType);
                 }
             }
 
@@ -80,10 +83,10 @@ public class PlayerLoader extends EntityLoader<DCPlayer> {
         values.put("name", entity.getPlayerName());
 
         BasicDBList lastServerTypes = new BasicDBList();
-        for (DCBungeeType bungeeType : entity.getLastServerTypes().keySet()) {
-            DCServerType serverType = entity.getLastServerTypes().get(bungeeType);
+        for (DCProxyType proxyType : entity.getLastServerTypes().keySet()) {
+            DCServerType serverType = entity.getLastServerTypes().get(proxyType);
             BasicDBObject lastType = new BasicDBObject();
-            lastType.put("_bungeeType", bungeeType.get_id());
+            lastType.put("_proxyType", proxyType.get_id());
             lastType.put("_serverType", serverType.get_id());
             lastServerTypes.add(lastType);
         }

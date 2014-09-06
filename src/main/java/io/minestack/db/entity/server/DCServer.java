@@ -1,11 +1,14 @@
-package io.minestack.db.entity;
+package io.minestack.db.entity.server;
 
+import io.minestack.db.entity.DCNode;
+import io.minestack.db.entity.DCPlayer;
+import io.minestack.db.entity.driver.DCDrivableEntity;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
 
-public class DCServer extends DCEntity {
+public class DCServer extends DCDrivableEntity {
 
     @Getter
     @Setter

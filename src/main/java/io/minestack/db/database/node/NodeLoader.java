@@ -1,10 +1,12 @@
-package io.minestack.db.database;
+package io.minestack.db.database.node;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import io.minestack.db.entity.DCBungeeType;
+import io.minestack.db.database.EntityLoader;
+import io.minestack.db.database.proxy.ProxyTypeLoader;
 import io.minestack.db.entity.DCNode;
+import io.minestack.db.entity.proxy.DCProxyType;
 import io.minestack.db.mongo.MongoDatabase;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
@@ -14,11 +16,11 @@ import java.util.ArrayList;
 @Log4j2
 public class NodeLoader extends EntityLoader<DCNode> {
 
-    private final BungeeTypeLoader bungeeTypeLoader;
+    private final ProxyTypeLoader proxyTypeLoader;
 
-    public NodeLoader(MongoDatabase db, BungeeTypeLoader bungeeTypeLoader) {
+    public NodeLoader(MongoDatabase db, ProxyTypeLoader proxyTypeLoader) {
         super(db, "nodes");
-        this.bungeeTypeLoader = bungeeTypeLoader;
+        this.proxyTypeLoader = proxyTypeLoader;
     }
 
     public DCNode getMaster() {
@@ -89,10 +91,10 @@ public class NodeLoader extends EntityLoader<DCNode> {
                 node.setLastUpdate((Long) lastUpdate);
             }
 
-            ObjectId _bungeeTypeId = (ObjectId) dbObject.get("_bungeeType");
-            if (_bungeeTypeId != null) {
-                DCBungeeType bungeeType = bungeeTypeLoader.loadEntity(_bungeeTypeId);
-                node.setBungeeType(bungeeType);
+            ObjectId _proxyTypeId = (ObjectId) dbObject.get("_proxyType");
+            if (_proxyTypeId != null) {
+                DCProxyType proxyType = proxyTypeLoader.loadEntity(_proxyTypeId);
+                node.setProxyType(proxyType);
             }
 
             return node;
@@ -106,10 +108,10 @@ public class NodeLoader extends EntityLoader<DCNode> {
         BasicDBObject values = new BasicDBObject();
 
         values.put("ram", node.getRam());
-        if (node.getBungeeType() != null) {
-            values.put("_bungeeType", node.getBungeeType().get_id());
+        if (node.getProxyType() != null) {
+            values.put("_proxyType", node.getProxyType().get_id());
         } else {
-            values.put("_bungeeType", null);
+            values.put("_proxyType", null);
         }
 
         BasicDBObject set = new BasicDBObject("$set", values);
@@ -124,10 +126,10 @@ public class NodeLoader extends EntityLoader<DCNode> {
         dbObject.put("host", node.getAddress());
         dbObject.put("ram", node.getRam());
         dbObject.put("lastUpdate", node.getLastUpdate());
-        if (node.getBungeeType() != null) {
-            dbObject.put("_bungeeType", node.getBungeeType().get_id());
+        if (node.getProxyType() != null) {
+            dbObject.put("_proxyType", node.getProxyType().get_id());
         } else {
-            dbObject.put("_bungeeType", null);
+            dbObject.put("_proxyType", null);
         }
         getDb().insert(getCollection(), dbObject);
         return (ObjectId)dbObject.get("_id");

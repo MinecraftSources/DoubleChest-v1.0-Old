@@ -1,13 +1,15 @@
-package io.minestack.db.entity;
+package io.minestack.db.entity.proxy;
 
+import io.minestack.db.entity.DCNode;
+import io.minestack.db.entity.driver.DCDrivableEntity;
 import lombok.Getter;
 import lombok.Setter;
 
-public class DCBungee extends DCEntity {
+public class DCProxy extends DCDrivableEntity {
 
     @Getter
     @Setter
-    private DCBungeeType bungeeType;
+    private DCProxyType proxyType;
 
     @Getter
     @Setter

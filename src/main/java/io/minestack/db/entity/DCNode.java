@@ -1,5 +1,6 @@
 package io.minestack.db.entity;
 
+import io.minestack.db.entity.proxy.DCProxyType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,5 +20,5 @@ public class DCNode extends DCEntity {
 
     @Getter
     @Setter
-    private DCBungeeType bungeeType;
+    private DCProxyType proxyType;
 }
