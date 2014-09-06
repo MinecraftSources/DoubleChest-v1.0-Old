@@ -50,6 +50,9 @@ public class DoubleChest {
     @Getter
     private static boolean needsInit = true;
 
+    @Getter
+    private static List<ServerAddress> mongoAddresses;
+
     private static DoubleChest database;
 
     public static void initDatabase(List<ServerAddress> mongoAddresses, List<Address> rabbitAddresses, String rabbitUsername, String rabbitPassword) throws Exception {
@@ -59,12 +62,17 @@ public class DoubleChest {
         }
     }
 
+    public static MongoDatabase createMongoInstance(String database) {
+        return new MongoDatabase(mongoAddresses, database);
+    }
+
     private DoubleChest(List<ServerAddress> mongoAddresses, List<Address> rabbitAddresses, String rabbitUsername, String rabbitPassword) throws Exception {
         if (mongoAddresses.isEmpty()) {
             throw new Exception("No valid mongo addresses");
         }
         log.info("Setting up mongo database minestack");
-        MongoDatabase mongoDatabase = new MongoDatabase(mongoAddresses, "minestack");
+        DoubleChest.mongoAddresses = mongoAddresses;
+        MongoDatabase mongoDatabase = createMongoInstance("minestack");
 
         if (rabbitAddresses.isEmpty()) {
             throw new Exception("No valid RabbitMQ addresses");
